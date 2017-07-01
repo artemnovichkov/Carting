@@ -35,6 +35,8 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
 - Write your script, then run it using `$ marathon run <path-to-your-script>`.
 
 ## Todo
+ - [ ] Add support of multiple targets
+ - [ ] Add option for platform selection
  - [ ] Add option for adding new script
  - [ ] Unify errors
  - [ ] Write tests
