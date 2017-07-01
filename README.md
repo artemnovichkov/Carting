@@ -30,7 +30,7 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
 ```
 ### Marathon
 
-- Install [Marathon](https://github.com/johnsundell/marathon).
+- Install [Marathon](https://github.com/johnsundell/marathon#installing).
 - Add Carting to Marathon using `$ marathon add git@github.com:artemnovichkov/carting.git`. Alternatively, add `git@github.com:artemnovichkov/carting.git` to your `Marathonfile`.
 - Write your script, then run it using `$ marathon run <path-to-your-script>`.
 
