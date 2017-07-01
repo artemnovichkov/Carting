@@ -3,19 +3,45 @@
 </p>
 
 <p align="center">
-<a href="https://swift.org/package-manager">
-<img src="https://img.shields.io/badge/Xcode-9%20beta%201-0080FF.svg" alt="Xcode 9 beta 1" />
-</a>
-<a href="https://swift.org/package-manager">
-<img src="https://img.shields.io/badge/Swift-4-yellow.svg?style=flat" alt="Swift 4" />
-</a>
+  <a href="https://swift.org/package-manager">
+    <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
+  </a>
 </p>
 
-Simple tool for updating Carthage script
+Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting do it for you. It scans Carthage folder, gets framework names and updates the script.
 
-## Features
+## Using
 
-Coming soon...
+Run `carting` in project folder. That's all.
+
+By default Carting searches a script named `Carthage`, but you can set a name of your script via command line arguments:
+
+`carting MyBestScript`
+
+## Installing
+
+### On macOS
+
+Using the Swift Package Manager:
+```
+$ git clone https://github.com/artemnovichkov/carting.git
+$ cd Carting
+$ swift build -c release -Xswiftc -static-stdlib
+$ cp -f .build/release/Carting /usr/local/bin/carting
+```
+
+### On Linux
+
+```
+$ git clone https://github.com/artemnovichkov//carting.git
+$ cd Carting
+$ swift build -c release
+$ cp -f .build/release/Carting /usr/local/bin/carting
+```
+## Todo
+ - [ ] Add option for adding new script
+ - [ ] Unify errors
+ - [ ] Write tests
 
 ## Author
 
