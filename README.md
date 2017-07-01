@@ -20,24 +20,20 @@ By default Carting searches a script named `Carthage`, but you can set a name of
 
 ## Installing
 
-### On macOS
+### Swift Package Manager:
 
-Using the Swift Package Manager:
 ```
 $ git clone https://github.com/artemnovichkov/carting.git
 $ cd Carting
 $ swift build -c release -Xswiftc -static-stdlib
 $ cp -f .build/release/Carting /usr/local/bin/carting
 ```
+### Marathon
 
-### On Linux
+- Install [Marathon](https://github.com/johnsundell/marathon).
+- Add Carting to Marathon using `$ marathon add git@github.com:artemnovichkov/carting.git`. Alternatively, add `git@github.com:artemnovichkov/carting.git` to your `Marathonfile`.
+- Write your script, then run it using `$ marathon run <path-to-your-script>`.
 
-```
-$ git clone https://github.com/artemnovichkov//carting.git
-$ cd Carting
-$ swift build -c release
-$ cp -f .build/release/Carting /usr/local/bin/carting
-```
 ## Todo
  - [ ] Add option for adding new script
  - [ ] Unify errors
