@@ -6,5 +6,5 @@ do {
     try carting.run()
 }
 catch {
-    print(error)
+    print("❌ \(error.localizedDescription)")
 }
