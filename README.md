@@ -6,6 +6,9 @@
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
   </a>
+  <a href="https://swift.org/package-manager">
+    <img src="https://img.shields.io/badge/marathon-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
+  </a>
 </p>
 
 Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting do it for you. It scans Carthage folder, gets framework names and updates the script.
