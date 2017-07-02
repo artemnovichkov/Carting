@@ -6,7 +6,7 @@
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
   </a>
-  <a href="https://swift.org/package-manager">
+  <a href="https://github.com/JohnSundell/Marathon">
     <img src="https://img.shields.io/badge/marathon-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
   </a>
 </p>
