@@ -38,13 +38,12 @@ public final class Carting {
         }
         else {
             let identifier = String.randomAlphaNumericString(length: 24)
-            let name = Keys.defaultScriptName
             let body = ScriptBody(inputPaths: inputPaths,
-                                  name: name,
+                                  name: carthageScriptName,
                                   outputPaths: outputPaths,
                                   shellScript: Keys.carthageScript)
-            let script = Script(identifier: identifier, name: name, body: body)
-            let buildPhase = BuildPhase(identifier: identifier, name: name)
+            let script = Script(identifier: identifier, name: carthageScriptName, body: body)
+            let buildPhase = BuildPhase(identifier: identifier, name: carthageScriptName)
             project.scripts.append(script)
             project.targets.first?.body.buildPhases.append(buildPhase)
         }
