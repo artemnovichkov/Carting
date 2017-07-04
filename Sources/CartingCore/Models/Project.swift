@@ -15,7 +15,7 @@ class Project {
     let targetsRange: Range<String.Index>
     let targets: [Target]
     let scriptsRange: Range<String.Index>
-    let scripts: [Script]
+    var scripts: [Script]
     
     init(name: String,
          body: String,

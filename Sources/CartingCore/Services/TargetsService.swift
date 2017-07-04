@@ -46,6 +46,11 @@ final class TargetsService {
         return (range, targets)
     }
     
+    func string(from targets: [Target]) -> String {
+        let targetStrings: [String] = targets.map { $0.description }
+        return targetStrings.joined(separator: "") + "\n"
+    }
+    
     private func targetsString(fromProjectString projectString: String) throws -> (Range<String.Index>, String) {
         guard
             let targetsStartRange = projectString.range(of: Keys.targetSectionBegin),

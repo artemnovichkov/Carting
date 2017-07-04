@@ -32,7 +32,7 @@ class Target {
 class TargetBody {
     
     let isa: String
-    let buildPhases: [BuildPhase]
+    var buildPhases: [BuildPhase]
     let buildConfigurationList: String
     let buildRules: String
     let dependencies: String
@@ -45,9 +45,9 @@ class TargetBody {
         var string = "\t\t\tisa = \(isa);\n"
         string += "\t\t\tbuildPhases = (\n"
         buildPhases.forEach { phase in
-            string += "\t\t\t\t\(phase.description)"
+            string += "\t\t\t\t\(phase.description),\n"
         }
-        string += ");\n"
+        string += "\t\t\t);\n"
         string += "\t\t\tbuildConfigurationList = \(buildConfigurationList);\n"
         string += "\t\t\tbuildRules = \(buildRules);\n"
         string += "\t\t\tdependencies = \(dependencies);\n"

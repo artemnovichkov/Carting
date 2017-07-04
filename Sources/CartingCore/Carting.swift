@@ -13,6 +13,7 @@ public final class Carting {
     
     private let projectService = ProjectService()
     private let scriptsService = ScriptsService()
+    private let targetsService = TargetsService()
     
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
@@ -35,10 +36,43 @@ public final class Carting {
             throw MainError.noScript(name: carthageScriptName)
         }
         
+        let identifier = randomAlphaNumericString(length: 24)
+        let name = "Test"
+        let body = Body(isa: "PBXShellScriptBuildPhase",
+                        buildActionMask: "2147483647",
+                        files: "(\n\t\t\t)",
+                        inputPaths: "(\n\t\t\t)",
+                        name: name,
+                        outputPaths: "(\n\t\t\t)",
+                        runOnlyForDeploymentPostprocessing: "0",
+                        shellPath: "/bin/sh",
+                        shellScript: "\"\"")
+        let script = Script(identifier: identifier, name: name, body: body)
+        let buildPhase = BuildPhase(identifier: identifier, name: name)
+        project.scripts.append(script)
+        project.targets.first?.body.buildPhases.append(buildPhase)
+        
         let newProjectString = project.body.replacingCharacters(in: project.scriptsRange,
                                                                 with: scriptsService.string(from: project.scripts))
-        try projectService.update(project, withString: newProjectString)
+        let newTarget = newProjectString.replacingCharacters(in: project.targetsRange,
+                                                             with: targetsService.string(from: project.targets))
+        try projectService.update(project, withString: newTarget)
         print("✅ Script \(carthageScriptName) was successfully updated.")
+    }
+    
+    func randomAlphaNumericString(length: Int) -> String {
+        let allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        let allowedCharsCount = UInt32(allowedChars.characters.count)
+        var randomString = ""
+        
+        for _ in 0..<length {
+            let randomNum = Int(arc4random_uniform(allowedCharsCount))
+            let randomIndex = allowedChars.index(allowedChars.startIndex, offsetBy: randomNum)
+            let newCharacter = allowedChars[randomIndex]
+            randomString += String(newCharacter)
+        }
+        
+        return randomString
     }
 }
 
