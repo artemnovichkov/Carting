@@ -19,7 +19,9 @@ Run `carting` in project folder. That's all.
 
 By default Carting searches a script named `Carthage`, but you can set a name of your script via command line arguments:
 
-`carting MyBestScript`
+```
+$ carting MyBestScript
+```
 
 If there is no script with the name, Carting will add a new one to first target.
 
