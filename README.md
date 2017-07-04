@@ -21,6 +21,10 @@ By default Carting searches a script named `Carthage`, but you can set a name of
 
 `carting MyBestScript`
 
+If there is no script with the name, Carting will add a new one to first target.
+
+**🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors.
+
 ## Installing
 
 ### Swift Package Manager:
@@ -38,9 +42,9 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
 - Write your script, then run it using `$ marathon run <path-to-your-script>`.
 
 ## Todo
+ - [x] Add option for adding new script
  - [ ] Add support of multiple targets
  - [ ] Add option for platform selection
- - [ ] Add option for adding new script
  - [ ] Unify errors
  - [ ] Write tests
 
