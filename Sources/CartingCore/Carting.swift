@@ -20,8 +20,7 @@ public final class Carting {
     
     public func run() throws {
         let project = try projectService.project()
-        print(project.targets)
-        print(project.scripts)
+        print(project.targets.first?.description)
         let frameworkNames = try projectService.frameworkNames()
         
         let carthageScriptName = arguments.count > 1 ? arguments[1] : "Carthage-iOS"

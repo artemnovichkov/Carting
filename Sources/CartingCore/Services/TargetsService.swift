@@ -72,15 +72,30 @@ final class TargetsService {
             }
         }
         guard
-            let isa = body["isa"]
+            let isa = body["isa"],
+        let buildPhases = body["buildPhases"],
+        let buildConfigurationList = body["buildConfigurationList"],
+        let buildRules = body["buildRules"],
+        let dependencies = body["dependencies"],
+        let name = body["name"],
+        let productName = body["productName"],
+        let productReference = body["productReference"],
+        let productType = body["productType"]
             else {
                 return nil
         }
         let set = CharacterSet(charactersIn: "()")
-        let rawBody = body["buildPhases"]!.trimmingCharacters(in: set)
-        let buildPhases = scanBuildPhases(fromString: rawBody)
+        let rawBody = buildPhases.trimmingCharacters(in: set)
+        let phases = scanBuildPhases(fromString: rawBody)
         return TargetBody(isa: isa,
-                          buildPhases: buildPhases)
+                          buildPhases: phases,
+                          buildConfigurationList: buildConfigurationList,
+                          buildRules: buildRules,
+                          dependencies: dependencies,
+                          name: name,
+                          productName: productName,
+                          productReference: productReference,
+                          productType: productType)
     }
     
     private func scanBuildPhases(fromString string: String) -> [BuildPhase] {
