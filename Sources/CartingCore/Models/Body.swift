@@ -32,15 +32,15 @@ class Body {
         return string
     }
     
-    init(isa: String,
-         buildActionMask: String,
-         files: String,
-         inputPaths: String,
+    init(isa: String = "PBXShellScriptBuildPhase",
+         buildActionMask: String = "2147483647",
+         files: String = "(\n\t\t\t)",
+         inputPaths: String = "(\n\t\t\t)",
          name: String,
-         outputPaths: String,
-         runOnlyForDeploymentPostprocessing: String,
-         shellPath: String,
-         shellScript: String) {
+         outputPaths: String = "(\n\t\t\t)",
+         runOnlyForDeploymentPostprocessing: String = "0",
+         shellPath: String = "/bin/sh",
+         shellScript: String = "\"\"") {
         self.isa = isa
         self.buildActionMask = buildActionMask
         self.files = files

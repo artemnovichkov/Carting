@@ -65,8 +65,14 @@ final class ProjectService {
                        scripts: scripts)
     }
     
-    func update(_ project: Project, withString string: String) throws {
-        try string.write(toFile: fileManager.currentDirectoryPath + "/\(project.name)" + Keys.projectPath,
+    func update(_ project: Project) throws {
+        let newScriptsProjectString = project.body.replacingCharacters(in: project.scriptsRange,
+                                                                       with: scriptsService.string(from: project.scripts))
+        let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
+                                                                                  with: targetsService.string(from: project.targets))
+        
+        let path = fileManager.currentDirectoryPath + "/\(project.name)" + Keys.projectPath
+        try newTargetsProjectString.write(toFile: path,
                          atomically: true,
                          encoding: .utf8)
     }
