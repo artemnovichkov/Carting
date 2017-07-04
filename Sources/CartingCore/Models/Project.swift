@@ -12,9 +12,13 @@ class Project {
     
     let name: String
     let body: String
+    let targets: [Target]
+    let scripts: [Script]
     
-    init(name: String, body: String) {
+    init(name: String, body: String, targets: [Target], scripts: [Script]) {
         self.name = name
         self.body = body
+        self.targets = targets
+        self.scripts = scripts
     }
 }

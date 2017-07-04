@@ -29,9 +29,12 @@ final class ProjectService {
     }
     
     let fileManager: FileManager
+    let targetsService: TargetsService
     
-    init(fileManager: FileManager = FileManager.default) {
+    init(fileManager: FileManager = FileManager.default,
+         targetsService: TargetsService = TargetsService()) {
         self.fileManager = fileManager
+        self.targetsService = targetsService
     }
     
     /// - Returns: a Project instance from current directory.
@@ -49,7 +52,7 @@ final class ProjectService {
             let body = String(data: data, encoding: .utf8) else {
             throw Error.cannotReadProject
         }
-        return Project(name: projectFileName, body: body)
+        return Project(name: projectFileName, body: body, targets: [], scripts: [])
     }
     
     func update(_ project: Project, withString string: String) throws {
