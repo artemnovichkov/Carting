@@ -18,6 +18,8 @@ final class TargetsService {
         static let targetSectionEnd = "/* End PBXNativeTarget section */"
     }
     
+    /// - Parameter string: a string from project.pbxproj file.
+    /// - Returns: a tuple with a range of scripts and an array of mapped targets.
     func targets(fromProjectString string: String) throws -> (Range<String.Index>, [Target]) {
         let (range, targetsString) = try self.targetsString(fromProjectString: string)
         let scanner = Scanner(string: targetsString)
@@ -46,11 +48,16 @@ final class TargetsService {
         return (range, targets)
     }
     
+    /// - Parameter scripts: an array of targets.
+    /// - Returns: formatted string with all targets for insertion into project.
     func string(from targets: [Target]) -> String {
         let targetStrings: [String] = targets.map { $0.description }
         return targetStrings.joined(separator: "") + "\n"
     }
     
+    /// - Parameter projectString: a string from project.pbxproj file.
+    /// - Returns: a tuple with targets range and targets section string.
+    /// - Throws: an error if there is no targets section in project string.
     private func targetsString(fromProjectString projectString: String) throws -> (Range<String.Index>, String) {
         guard
             let targetsStartRange = projectString.range(of: Keys.targetSectionBegin),
@@ -62,6 +69,8 @@ final class TargetsService {
         return (targetsRange, projectString.substring(with: targetsRange))
     }
     
+    /// - Parameter string: a string of target body from curly braces.
+    /// - Returns: a TargetBody instance if there are all needed keys.
     private func scanBody(fromString string: String) -> TargetBody? {
         let scanner = Scanner(string: string)
         var key: NSString?
@@ -103,6 +112,8 @@ final class TargetsService {
                           productType: productType)
     }
     
+    /// - Parameter string: a string of build phases.
+    /// - Returns: an array of mapped build phases.
     private func scanBuildPhases(fromString string: String) -> [BuildPhase] {
         let scanner = Scanner(string: string)
         var identifier: NSString?

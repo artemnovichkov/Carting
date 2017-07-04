@@ -19,8 +19,8 @@ final class ScriptsService {
         static let buildPhaseSectionEnd = "/* End PBXShellScriptBuildPhase section */"
     }
     
-    /// - Parameter string: script string from Build Phase section in project.
-    /// - Returns: an array of mapped scripts.
+    /// - Parameter string: a string from project.pbxproj file.
+    /// - Returns: a tuple with a range of scripts and an array of mapped scripts.
     func scripts(fromProjectString string: String) throws -> (Range<String.Index>, [Script]) {
         let (range, scriptsString) = try self.scriptsString(fromProjectString: string)
         let scanner = Scanner(string: scriptsString)
@@ -57,8 +57,8 @@ final class ScriptsService {
     }
     
     /// - Parameter projectString: a string from project.pbxproj file.
-    /// - Returns: a tuple with script range and script section string.
-    /// - Throws: an error if there is no script section in project string.
+    /// - Returns: a tuple with scripts range and scripts section string.
+    /// - Throws: an error if there is no scripts section in project string.
     private func scriptsString(fromProjectString string: String) throws -> (Range<String.Index>, String) {
         guard let startRange = string.range(of: Keys.buildPhaseSectionBegin),
             let endRange = string.range(of: Keys.buildPhaseSectionEnd) else {
@@ -69,7 +69,7 @@ final class ScriptsService {
     }
     
     /// - Parameter string: a string of script body from curly braces.
-    /// - Returns: a body instance if there is all needed keys.
+    /// - Returns: a ScriptBody instance if there are all needed keys.
     private func scanBody(fromString string: String) -> ScriptBody? {
         let scanner = Scanner(string: string)
         var key: NSString?

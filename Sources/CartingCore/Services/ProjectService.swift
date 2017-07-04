@@ -65,6 +65,9 @@ final class ProjectService {
                        scripts: scripts)
     }
     
+    
+    /// - Parameter project: a project for updating.
+    /// - Throws: throws if it can not white a project to project file.
     func update(_ project: Project) throws {
         let newScriptsProjectString = project.body.replacingCharacters(in: project.scriptsRange,
                                                                        with: scriptsService.string(from: project.scripts))
