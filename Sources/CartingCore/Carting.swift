@@ -39,10 +39,10 @@ public final class Carting {
         else {
             let identifier = String.randomAlphaNumericString(length: 24)
             let name = Keys.defaultScriptName
-            let body = Body(inputPaths: inputPaths,
-                            name: name,
-                            outputPaths: outputPaths,
-                            shellScript: Keys.carthageScript)
+            let body = ScriptBody(inputPaths: inputPaths,
+                                  name: name,
+                                  outputPaths: outputPaths,
+                                  shellScript: Keys.carthageScript)
             let script = Script(identifier: identifier, name: name, body: body)
             let buildPhase = BuildPhase(identifier: identifier, name: name)
             project.scripts.append(script)

@@ -8,11 +8,11 @@
 
 import Foundation
 
-class Script {
+final class Script {
     
     let identifier: String
     let name: String
-    var body: Body
+    var body: ScriptBody
     
     var description: String {
         var string = "\n\t\t" + identifier
@@ -23,7 +23,7 @@ class Script {
         return string
     }
     
-    init(identifier: String, name: String, body: Body) {
+    init(identifier: String, name: String, body: ScriptBody) {
         self.identifier = identifier
         self.name = name
         self.body = body

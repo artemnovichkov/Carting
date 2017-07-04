@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Project {
+final class Project {
     
     let name: String
     let body: String

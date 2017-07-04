@@ -7,7 +7,7 @@
 
 import Foundation
 
-class BuildPhase {
+final class BuildPhase {
     
     let identifier: String
     let name: String

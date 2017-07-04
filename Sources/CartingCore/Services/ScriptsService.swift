@@ -70,7 +70,7 @@ final class ScriptsService {
     
     /// - Parameter string: a string of script body from curly braces.
     /// - Returns: a body instance if there is all needed keys.
-    private func scanBody(fromString string: String) -> Body? {
+    private func scanBody(fromString string: String) -> ScriptBody? {
         let scanner = Scanner(string: string)
         var key: NSString?
         var value: NSString?
@@ -97,15 +97,15 @@ final class ScriptsService {
             else {
                 return nil
         }
-        return Body(isa: isa,
-                    buildActionMask: buildActionMask,
-                    files: files,
-                    inputPaths: inputPaths,
-                    name: name,
-                    outputPaths: outputPaths,
-                    runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
-                    shellPath: shellPath,
-                    shellScript: shellScript)
+        return ScriptBody(isa: isa,
+                          buildActionMask: buildActionMask,
+                          files: files,
+                          inputPaths: inputPaths,
+                          name: name,
+                          outputPaths: outputPaths,
+                          runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
+                          shellPath: shellPath,
+                          shellScript: shellScript)
     }
 }
 

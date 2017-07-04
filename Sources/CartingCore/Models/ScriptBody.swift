@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Body {
+final class ScriptBody {
     let isa: String
     let buildActionMask: String
     var files: String
