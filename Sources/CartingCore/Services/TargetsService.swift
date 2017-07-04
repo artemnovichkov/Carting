@@ -18,19 +18,9 @@ final class TargetsService {
         static let targetSectionEnd = "/* End PBXNativeTarget section */"
     }
     
-    func targetsString(fromProjectString projectString: String) throws -> (Range<String.Index>, String) {
-        guard
-            let targetsStartRange = projectString.range(of: Keys.targetSectionBegin),
-            let targetsEndRange = projectString.range(of: Keys.targetSectionEnd) else {
-                throw Error.noTargets
-        }
-        
-        let targetsRange = targetsStartRange.upperBound..<targetsEndRange.lowerBound
-        return (targetsRange, projectString.substring(with: targetsRange))
-    }
-    
-    func targets(fromString string: String) -> [Target] {
-        let scanner = Scanner(string: string)
+    func targets(fromProjectString string: String) throws -> (Range<String.Index>, [Target]) {
+        let (range, targetsString) = try self.targetsString(fromProjectString: string)
+        let scanner = Scanner(string: targetsString)
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
@@ -53,7 +43,18 @@ final class TargetsService {
                 targets.append(target)
             }
         }
-        return targets
+        return (range, targets)
+    }
+    
+    private func targetsString(fromProjectString projectString: String) throws -> (Range<String.Index>, String) {
+        guard
+            let targetsStartRange = projectString.range(of: Keys.targetSectionBegin),
+            let targetsEndRange = projectString.range(of: Keys.targetSectionEnd) else {
+                throw Error.noTargets
+        }
+        
+        let targetsRange = targetsStartRange.upperBound..<targetsEndRange.lowerBound
+        return (targetsRange, projectString.substring(with: targetsRange))
     }
     
     private func scanBody(fromString string: String) -> TargetBody? {
@@ -101,5 +102,14 @@ final class TargetsService {
             }
         }
         return buildPhases
+    }
+}
+
+extension TargetsService.Error: LocalizedError {
+    
+    var errorDescription: String? {
+        switch self {
+        case .noTargets: return "Can't find target section in project."
+        }
     }
 }

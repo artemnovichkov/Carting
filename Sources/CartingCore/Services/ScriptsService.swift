@@ -21,8 +21,9 @@ final class ScriptsService {
     
     /// - Parameter string: script string from Build Phase section in project.
     /// - Returns: an array of mapped scripts.
-    func scripts(fromString string: String) -> [Script] {
-        let scanner = Scanner(string: string)
+    func scripts(fromProjectString string: String) throws -> (Range<String.Index>, [Script]) {
+        let (range, scriptsString) = try self.scriptsString(fromProjectString: string)
+        let scanner = Scanner(string: scriptsString)
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
@@ -45,7 +46,7 @@ final class ScriptsService {
                 scripts.append(script)
             }
         }
-        return scripts
+        return (range, scripts)
     }
     
     /// - Parameter scripts: an array of scripts.
@@ -58,13 +59,13 @@ final class ScriptsService {
     /// - Parameter projectString: a string from project.pbxproj file.
     /// - Returns: a tuple with script range and script section string.
     /// - Throws: an error if there is no script section in project string.
-    func scriptsString(fromProjectString projectString: String) throws -> (Range<String.Index>, String) {
-        guard let startRange = projectString.range(of: Keys.buildPhaseSectionBegin),
-            let endRange = projectString.range(of: Keys.buildPhaseSectionEnd) else {
+    private func scriptsString(fromProjectString string: String) throws -> (Range<String.Index>, String) {
+        guard let startRange = string.range(of: Keys.buildPhaseSectionBegin),
+            let endRange = string.range(of: Keys.buildPhaseSectionEnd) else {
                 throw Error.noScripts
         }
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
-        return (scriptsRange, projectString.substring(with: scriptsRange))
+        return (scriptsRange, string.substring(with: scriptsRange))
     }
     
     /// - Parameter string: a string of script body from curly braces.

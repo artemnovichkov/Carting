@@ -30,11 +30,14 @@ final class ProjectService {
     
     let fileManager: FileManager
     let targetsService: TargetsService
+    let scriptsService: ScriptsService
     
     init(fileManager: FileManager = FileManager.default,
-         targetsService: TargetsService = TargetsService()) {
+         targetsService: TargetsService = TargetsService(),
+         scriptsService: ScriptsService = ScriptsService()) {
         self.fileManager = fileManager
         self.targetsService = targetsService
+        self.scriptsService = scriptsService
     }
     
     /// - Returns: a Project instance from current directory.
@@ -50,9 +53,16 @@ final class ProjectService {
         let path = fileManager.currentDirectoryPath + "/\(projectFileName)" + Keys.projectPath
         guard let data = fileManager.contents(atPath: path),
             let body = String(data: data, encoding: .utf8) else {
-            throw Error.cannotReadProject
+                throw Error.cannotReadProject
         }
-        return Project(name: projectFileName, body: body, targets: [], scripts: [])
+        let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
+        let (scriptsRange, scripts) = try scriptsService.scripts(fromProjectString: body)
+        return Project(name: projectFileName,
+                       body: body,
+                       targetsRange: targetsRange,
+                       targets: targets,
+                       scriptsRange: scriptsRange,
+                       scripts: scripts)
     }
     
     func update(_ project: Project, withString string: String) throws {
