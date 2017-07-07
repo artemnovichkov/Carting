@@ -21,12 +21,12 @@ final class TargetBody {
     
     var description: String {
         var string = "\t\t\tisa = \(isa);\n"
+        string += "\t\t\tbuildConfigurationList = \(buildConfigurationList);\n"
         string += "\t\t\tbuildPhases = (\n"
         buildPhases.forEach { phase in
             string += "\t\t\t\t\(phase.description),\n"
         }
         string += "\t\t\t);\n"
-        string += "\t\t\tbuildConfigurationList = \(buildConfigurationList);\n"
         string += "\t\t\tbuildRules = \(buildRules);\n"
         string += "\t\t\tdependencies = \(dependencies);\n"
         string += "\t\t\tname = \(name);\n"
