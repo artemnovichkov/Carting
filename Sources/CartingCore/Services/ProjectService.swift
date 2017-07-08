@@ -86,15 +86,6 @@ final class ProjectService {
                          encoding: .utf8)
     }
     
-    /// - Returns: an array of iOS frameworks names built by Carthage.
-    /// - Throws: ar error if there is no Carthage folder.
-    func frameworkNames() throws -> [String] {
-        let fileNames = try fileManager.contentsOfDirectory(atPath: fileManager.currentDirectoryPath + Keys.carthagePath)
-        return fileNames.filter { file in
-            return file.hasSuffix(Keys.frameworkExtension)
-        }
-    }
-    
     /// - Parameters:
     ///   - names: names of frameworks with .framework extension, for example, "Alamofire.framework".
     ///   - type: type of path.

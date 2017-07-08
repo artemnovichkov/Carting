@@ -24,28 +24,48 @@ public final class Carting {
     
     public func run() throws {
         let project = try projectService.project()
-        let frameworkNames = try projectService.frameworkNames()
-        
-        let inputPaths = projectService.pathsString(forFrameworkNames: frameworkNames, type: .input)
-        let outputPaths = projectService.pathsString(forFrameworkNames: frameworkNames, type: .output)
         
         let carthageScriptName = arguments.count > 1 ? arguments[1] : Keys.defaultScriptName
-        let carthageScript = project.scripts.filter { $0.name == carthageScriptName }.first
-        if let carthageScript = carthageScript {
-            carthageScript.body.inputPaths = inputPaths
-            carthageScript.body.outputPaths = outputPaths
-            carthageScript.body.shellScript = Keys.carthageScript
-        }
-        else {
-            let identifier = String.randomAlphaNumericString(length: 24)
-            let body = ScriptBody(inputPaths: inputPaths,
-                                  name: carthageScriptName,
-                                  outputPaths: outputPaths,
-                                  shellScript: Keys.carthageScript)
-            let script = Script(identifier: identifier, name: carthageScriptName, body: body)
-            let buildPhase = BuildPhase(identifier: identifier, name: carthageScriptName)
-            project.scripts.append(script)
-            project.targets.first?.body.buildPhases.append(buildPhase)
+        
+        project.targets.forEach { target in
+            let frameworkBuildPhase = target.body.buildPhases
+                .filter { $0.name == "Frameworks" }
+                .first
+            let frameworkScript = project.frameworkScripts
+                .filter { $0.identifier == frameworkBuildPhase?.identifier }
+                .first
+            guard let script = frameworkScript else {
+                return
+            }
+            let linkedFrameworkNames = script.body.files.map { $0.name }
+            
+            let carthageBuildPhase = target.body.buildPhases
+                .filter { $0.name == carthageScriptName }
+                .first
+            let carthageScript = project.scripts
+                .filter { $0.identifier == carthageBuildPhase?.identifier }
+                .first
+            
+            let inputPaths = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .input)
+            let outputPaths = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .output)
+            
+            if let carthage = carthageScript {
+                carthage.body.inputPaths = inputPaths
+                carthage.body.outputPaths = outputPaths
+                carthage.body.shellScript = Keys.carthageScript
+            }
+            else {
+                let body = ScriptBody(inputPaths: inputPaths,
+                                      name: carthageScriptName,
+                                      outputPaths: outputPaths,
+                                      shellScript: Keys.carthageScript)
+                
+                let identifier = String.randomAlphaNumericString(length: 24)
+                let script = Script(identifier: identifier, name: carthageScriptName, body: body)
+                let buildPhase = BuildPhase(identifier: identifier, name: carthageScriptName)
+                project.scripts.append(script)
+                target.body.buildPhases.append(buildPhase)
+            }
         }
         
         try projectService.update(project)
