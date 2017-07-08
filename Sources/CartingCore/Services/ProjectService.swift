@@ -113,7 +113,7 @@ final class ProjectService {
         paths.forEach { path in
             string += "\t\t\t\t\"\(path)\",\n"
         }
-        string += ")"
+        string += "\t\t\t)"
         return string
     }
 }
