@@ -1,5 +1,5 @@
 //
-//  ScriptsService.swift
+//  ShellScriptsService.swift
 //  Carting
 //
 //  Created by Artem Novichkov on 29/06/2017.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-final class ScriptsService {
+final class ShellScriptsService {
     
     enum Error: Swift.Error {
         case noScripts
@@ -109,7 +109,7 @@ final class ScriptsService {
     }
 }
 
-extension ScriptsService.Error: LocalizedError {
+extension ShellScriptsService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {

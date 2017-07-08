@@ -30,14 +30,14 @@ final class ProjectService {
     
     let fileManager: FileManager
     let targetsService: TargetsService
-    let scriptsService: ScriptsService
+    let shellScriptsService: ShellScriptsService
     
     init(fileManager: FileManager = FileManager.default,
          targetsService: TargetsService = TargetsService(),
-         scriptsService: ScriptsService = ScriptsService()) {
+         shellScriptsService: ShellScriptsService = ShellScriptsService()) {
         self.fileManager = fileManager
         self.targetsService = targetsService
-        self.scriptsService = scriptsService
+        self.shellScriptsService = shellScriptsService
     }
     
     /// - Returns: a Project instance from current directory.
@@ -56,7 +56,7 @@ final class ProjectService {
                 throw Error.cannotReadProject
         }
         let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
-        let (scriptsRange, scripts) = try scriptsService.scripts(fromProjectString: body)
+        let (scriptsRange, scripts) = try shellScriptsService.scripts(fromProjectString: body)
         return Project(name: projectFileName,
                        body: body,
                        targetsRange: targetsRange,
@@ -70,7 +70,7 @@ final class ProjectService {
     /// - Throws: throws if it can not white a project to project file.
     func update(_ project: Project) throws {
         let newScriptsProjectString = project.body.replacingCharacters(in: project.scriptsRange,
-                                                                       with: scriptsService.string(from: project.scripts))
+                                                                       with: shellScriptsService.string(from: project.scripts))
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
         
