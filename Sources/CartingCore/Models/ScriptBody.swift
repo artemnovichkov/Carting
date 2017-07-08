@@ -8,14 +8,11 @@
 
 import Foundation
 
-final class ScriptBody {
-    let isa: String
-    let buildActionMask: String
-    var files: String
+final class ScriptBody: BaseScriptBody {
+    
     var inputPaths: String
     let name: String
     var outputPaths: String
-    var runOnlyForDeploymentPostprocessing: String
     var shellPath: String
     var shellScript: String
     
@@ -41,14 +38,14 @@ final class ScriptBody {
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
          shellScript: String = "\"\"") {
-        self.isa = isa
-        self.buildActionMask = buildActionMask
-        self.files = files
         self.inputPaths = inputPaths
         self.name = name
         self.outputPaths = outputPaths
-        self.runOnlyForDeploymentPostprocessing = runOnlyForDeploymentPostprocessing
         self.shellPath = shellPath
         self.shellScript = shellScript
+        super.init(isa: isa,
+                   buildActionMask: buildActionMask,
+                   files: files,
+                   runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing)
     }
 }
