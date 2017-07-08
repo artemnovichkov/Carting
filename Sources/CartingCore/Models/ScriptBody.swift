@@ -19,7 +19,11 @@ final class ScriptBody: BaseScriptBody {
     var description: String {
         var string = "\t\t\tisa = \(isa);\n"
         string += "\t\t\tbuildActionMask = \(buildActionMask);\n"
-        string += "\t\t\tfiles = \(files);\n"
+        string += "\t\t\tfiles = ("
+        files.forEach { file in
+            string += "\t\t\t\t\(file.identifier) /* \(file.name) in \(file.folder) */,\n"
+        }
+        string += ");\n"
         string += "\t\t\tinputPaths = \(inputPaths);\n"
         string += "\t\t\tname = \(name);\n"
         string += "\t\t\toutputPaths = \(outputPaths);\n"
@@ -31,7 +35,7 @@ final class ScriptBody: BaseScriptBody {
     
     init(isa: String = "PBXShellScriptBuildPhase",
          buildActionMask: String = "2147483647",
-         files: String = "(\n\t\t\t)",
+         files: [File] = [],
          inputPaths: String = "(\n\t\t\t)",
          name: String,
          outputPaths: String = "(\n\t\t\t)",

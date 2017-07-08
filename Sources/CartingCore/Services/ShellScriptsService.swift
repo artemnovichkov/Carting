@@ -87,7 +87,6 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
-            let files = body["files"],
             let inputPaths = body["inputPaths"],
             let name = body["name"],
             let outputPaths = body["outputPaths"],
@@ -96,6 +95,10 @@ final class ShellScriptsService {
             let shellScript = body["shellScript"]
             else {
                 return nil
+        }
+        var files = [File]()
+        if let filesString = body["files"] {
+            files = FilesService.scanFiles(fromString: filesString)
         }
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
