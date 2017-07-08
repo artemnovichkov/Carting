@@ -31,13 +31,16 @@ final class ProjectService {
     let fileManager: FileManager
     let targetsService: TargetsService
     let shellScriptsService: ShellScriptsService
+    let frameworksService: FrameworksService
     
     init(fileManager: FileManager = FileManager.default,
          targetsService: TargetsService = TargetsService(),
-         shellScriptsService: ShellScriptsService = ShellScriptsService()) {
+         shellScriptsService: ShellScriptsService = ShellScriptsService(),
+         frameworksService: FrameworksService = FrameworksService()) {
         self.fileManager = fileManager
         self.targetsService = targetsService
         self.shellScriptsService = shellScriptsService
+        self.frameworksService = frameworksService
     }
     
     /// - Returns: a Project instance from current directory.
@@ -57,6 +60,11 @@ final class ProjectService {
         }
         let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
         let (scriptsRange, scripts) = try shellScriptsService.scripts(fromProjectString: body)
+        let (frameworksRange, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
+        frameworkScripts.forEach { script in
+            print(script.body.files)
+        }
+        
         return Project(name: projectFileName,
                        body: body,
                        targetsRange: targetsRange,
