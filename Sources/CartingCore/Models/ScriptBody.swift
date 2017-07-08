@@ -19,11 +19,11 @@ final class ScriptBody: BaseScriptBody {
     var description: String {
         var string = "\t\t\tisa = \(isa);\n"
         string += "\t\t\tbuildActionMask = \(buildActionMask);\n"
-        string += "\t\t\tfiles = ("
+        string += "\t\t\tfiles = (\n"
         files.forEach { file in
             string += "\t\t\t\t\(file.identifier) /* \(file.name) in \(file.folder) */,\n"
         }
-        string += ");\n"
+        string += "\t\t\t);\n"
         string += "\t\t\tinputPaths = \(inputPaths);\n"
         string += "\t\t\tname = \(name);\n"
         string += "\t\t\toutputPaths = \(outputPaths);\n"
