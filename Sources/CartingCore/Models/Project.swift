@@ -16,18 +16,21 @@ final class Project {
     let targets: [Target]
     let scriptsRange: Range<String.Index>
     var scripts: [Script]
+    var frameworkScripts: [FrameworkScript]
     
     init(name: String,
          body: String,
          targetsRange: Range<String.Index>,
          targets: [Target],
          scriptsRange: Range<String.Index>,
-         scripts: [Script]) {
+         scripts: [Script],
+         frameworkScripts: [FrameworkScript]) {
         self.name = name
         self.body = body
         self.targetsRange = targetsRange
         self.targets = targets
         self.scriptsRange = scriptsRange
         self.scripts = scripts
+        self.frameworkScripts = frameworkScripts
     }
 }

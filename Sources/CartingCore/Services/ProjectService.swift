@@ -60,17 +60,15 @@ final class ProjectService {
         }
         let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
         let (scriptsRange, scripts) = try shellScriptsService.scripts(fromProjectString: body)
-        let (frameworksRange, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
-        frameworkScripts.forEach { script in
-            print(script.body.files)
-        }
+        let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
         
         return Project(name: projectFileName,
                        body: body,
                        targetsRange: targetsRange,
                        targets: targets,
                        scriptsRange: scriptsRange,
-                       scripts: scripts)
+                       scripts: scripts,
+                       frameworkScripts: frameworkScripts)
     }
     
     
