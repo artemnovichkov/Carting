@@ -11,7 +11,7 @@
   </a>
 </p>
 
-Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting do it for you. It scans Carthage folder, gets framework names and updates the script.
+Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting do it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
 
 ## Using
 
@@ -23,7 +23,7 @@ By default Carting searches a script named `Carthage`, but you can set a name of
 $ carting MyBestScript
 ```
 
-If there is no script with the name, Carting will add a new one to first target.
+If there is no script with the name, Carting will add a new one.
 
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors.
 
