@@ -25,7 +25,8 @@ $ carting MyBestScript
 
 If there is no script with the name, Carting will add a new one.
 
-**🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors.
+**🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
+<img src="error.png" alt="Project parsing error" />
 
 ## Installing
 
