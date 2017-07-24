@@ -38,7 +38,7 @@ public final class Carting {
                 return
             }
             let carthageFrameworkNames = try projectService.frameworkNames()
-            let linkedFrameworkNames = script.body.files
+            let linkedCarthageFrameworkNames = script.body.files
                 .filter { carthageFrameworkNames.contains($0.name) }
                 .map { $0.name }
             
@@ -49,8 +49,10 @@ public final class Carting {
                 .filter { $0.identifier == carthageBuildPhase?.identifier }
                 .first
             
-            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .input)
-            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .output)
+            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+                                                              type: .input)
+            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+                                                               type: .output)
             
             if let carthage = carthageScript {
                 carthage.body.inputPaths = inputPathsString
