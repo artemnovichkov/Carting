@@ -49,18 +49,18 @@ public final class Carting {
                 .filter { $0.identifier == carthageBuildPhase?.identifier }
                 .first
             
-            let inputPaths = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .input)
-            let outputPaths = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .output)
+            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .input)
+            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedFrameworkNames, type: .output)
             
             if let carthage = carthageScript {
-                carthage.body.inputPaths = inputPaths
-                carthage.body.outputPaths = outputPaths
+                carthage.body.inputPaths = inputPathsString
+                carthage.body.outputPaths = outputPathsString
                 carthage.body.shellScript = Keys.carthageScript
             }
             else {
-                let body = ScriptBody(inputPaths: inputPaths,
+                let body = ScriptBody(inputPaths: inputPathsString,
                                       name: carthageScriptName,
-                                      outputPaths: outputPaths,
+                                      outputPaths: outputPathsString,
                                       shellScript: Keys.carthageScript)
                 
                 let identifier = String.randomAlphaNumericString(length: 24)
