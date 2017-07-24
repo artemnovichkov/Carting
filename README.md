@@ -47,7 +47,7 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
  - [x] Add option for adding new script
  - [x] Add support of multiple targets
  - [x] Add check of linked frameworks
- - [ ] Add option for platform selection or automatic check
+ - [x] Add option for platform selection or automatic check
  - [ ] Unify errors
  - [ ] Write tests
 
