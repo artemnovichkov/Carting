@@ -30,6 +30,14 @@ If there is no script with the name, Carting will add a new one.
 
 ## Installing
 
+### Make:
+
+```
+$ git clone https://github.com/artemnovichkov/carting.git
+$ cd Carting
+$ make
+```
+
 ### Swift Package Manager:
 
 ```
