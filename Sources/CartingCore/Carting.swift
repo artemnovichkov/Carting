@@ -59,7 +59,7 @@ public final class Carting {
                 carthage.body.outputPaths = outputPathsString
                 carthage.body.shellScript = Keys.carthageScript
             }
-            else {
+            else if linkedCarthageFrameworkNames.count > 0 {
                 let body = ScriptBody(inputPaths: inputPathsString,
                                       name: carthageScriptName,
                                       outputPaths: outputPathsString,
