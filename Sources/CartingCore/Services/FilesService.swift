@@ -26,9 +26,9 @@ class FilesService {
             scanner.scanUpTo(" */,", into: &folder)
             scanner.scanString("*/,", into: nil)
             
-            if let identifier = identifier as? String,
-                let name = name as? String,
-                let folder = folder as? String {
+            if let identifier = identifier as String?,
+                let name = name as String?,
+                let folder = folder as String? {
                 let file = File(identifier: identifier, name: name, folder: folder)
                 files.append(file)
             }

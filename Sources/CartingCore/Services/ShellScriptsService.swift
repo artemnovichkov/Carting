@@ -39,8 +39,8 @@ final class ShellScriptsService {
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
             
-            if let name = name as? String,
-                let identifier = identifier as? String,
+            if let name = name as String?,
+                let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
                 let script = Script(identifier: identifier, name: name, body: body)
                 scripts.append(script)

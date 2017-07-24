@@ -38,8 +38,8 @@ final class TargetsService {
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
             
-            if let name = name as? String,
-                let identifier = identifier as? String,
+            if let name = name as String?,
+                let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
                 let target = Target(identifier: identifier, name: name, body: body)
                 targets.append(target)
@@ -126,8 +126,8 @@ final class TargetsService {
             scanner.scanUpTo(" */,", into: &name)
             scanner.scanString("*/,", into: nil)
             
-            if let name = name as? String,
-                let identifier = identifier as? String {
+            if let name = name as String?,
+                let identifier = identifier as String? {
                 let buildPhase = BuildPhase(identifier: identifier, name: name)
                 buildPhases.append(buildPhase)
             }
