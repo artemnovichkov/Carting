@@ -105,6 +105,15 @@ final class ProjectService {
         }
     }
     
+    /// - Returns: an array of iOS frameworks names built by Carthage.
+    /// - Throws: ar error if there is no Carthage folder.
+    func frameworkNames() throws -> [String] {
+        let fileNames = try fileManager.contentsOfDirectory(atPath: fileManager.currentDirectoryPath + Keys.carthagePath)
+        return fileNames.filter { file in
+            return file.hasSuffix(Keys.frameworkExtension)
+        }
+    }
+    
     private func decription(forPaths paths: [String]) -> String {
         var string = "(\n"
         paths.forEach { path in
