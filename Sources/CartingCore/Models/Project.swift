@@ -14,7 +14,7 @@ final class Project {
     let body: String
     let targetsRange: Range<String.Index>
     let targets: [Target]
-    let scriptsRange: Range<String.Index>
+    let scriptsRange: Range<String.Index>?
     var scripts: [Script]
     var frameworkScripts: [FrameworkScript]
     
@@ -22,7 +22,7 @@ final class Project {
          body: String,
          targetsRange: Range<String.Index>,
          targets: [Target],
-         scriptsRange: Range<String.Index>,
+         scriptsRange: Range<String.Index>?,
          scripts: [Script],
          frameworkScripts: [FrameworkScript]) {
         self.name = name
