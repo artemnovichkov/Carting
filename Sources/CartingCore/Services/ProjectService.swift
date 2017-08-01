@@ -13,6 +13,7 @@ final class ProjectService {
     enum Error: Swift.Error {
         case noProjectFile
         case cannotReadProject
+        case cannotFindProjectResources
     }
     
     enum PathType {
@@ -26,6 +27,7 @@ final class ProjectService {
         static let outputPath = "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/"
         static let projectExtension = "xcodeproj"
         static let frameworkExtension = "framework"
+        static let resourcesBuildSectionEnd = "/* End PBXResourcesBuildPhase section */"
     }
     
     let fileManager: FileManager
@@ -81,8 +83,12 @@ final class ProjectService {
                                                                        with: shellScriptsService.string(from: project.scripts))
         }
         else {
-            //TODO: find PBXResourcesBuildPhase and insert scripts section
-            newScriptsProjectString = ""
+            if let range = project.body.range(of: Keys.resourcesBuildSectionEnd) {
+//                project.body.insert(shellScriptsService.string(from: project.scripts), at: range.upperBound)
+            }
+            else {
+                throw Error.cannotFindProjectResources
+            }
         }
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
@@ -137,6 +143,7 @@ extension ProjectService.Error: LocalizedError {
         switch self {
         case .noProjectFile: return "Can't find any .pbxproj file."
         case .cannotReadProject: return "Can't read a project."
+        case .cannotFindProjectResources: return "Can't fine Resources section in a project."
         }
     }
 }
