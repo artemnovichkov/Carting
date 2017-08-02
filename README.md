@@ -12,7 +12,7 @@
   </a>
 </p>
 
-Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting do it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
+Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting does it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
 
 ## Using
 
@@ -57,7 +57,7 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
  - [x] Add option for adding new script
  - [x] Add support of multiple targets
  - [x] Add check of linked frameworks
- - [x] Add option for platform selection or automatic check
+ - [ ] Add support of tvOS and watchOS platforms
  - [ ] Check correct work with workspaces
  - [ ] Unify errors
  - [ ] Write tests
