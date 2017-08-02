@@ -82,13 +82,16 @@ final class ProjectService {
             newScriptsProjectString = project.body.replacingCharacters(in: scriptsRange,
                                                                        with: shellScriptsService.string(from: project.scripts))
         }
+        else if let range = project.body.range(of: Keys.resourcesBuildSectionEnd) {
+            var body = project.body
+            let scriptsString = shellScriptsService.string(from: project.scripts,
+                                                           needSectionBlock: true)
+            body.insert(contentsOf: "\n\n\(scriptsString)".characters,
+                        at: range.upperBound)
+            newScriptsProjectString = body
+        }
         else {
-            if let range = project.body.range(of: Keys.resourcesBuildSectionEnd) {
-//                project.body.insert(shellScriptsService.string(from: project.scripts), at: range.upperBound)
-            }
-            else {
-                throw Error.cannotFindProjectResources
-            }
+            throw Error.cannotFindProjectResources
         }
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))

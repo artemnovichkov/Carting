@@ -52,11 +52,17 @@ final class ShellScriptsService {
         return (range, scripts)
     }
     
-    /// - Parameter scripts: an array of scripts.
+    /// - Parameters:
+    ///   - scripts: an array of scripts.
+    ///   - needSectionBlock: if true, returns whole section block
     /// - Returns: formatted string with all scripts for insertion into project.
-    func string(from scripts: [Script]) -> String {
+    func string(from scripts: [Script], needSectionBlock: Bool = false) -> String {
         let scriptStrings: [String] = scripts.map { $0.description }
-        return scriptStrings.joined(separator: "") + "\n"
+        var scriptString = scriptStrings.joined(separator: "") + "\n"
+        if needSectionBlock {
+            scriptString = Keys.buildPhaseSectionBegin + scriptString + Keys.buildPhaseSectionEnd
+        }
+        return scriptString
     }
     
     /// - Parameter projectString: a string from project.pbxproj file.
