@@ -20,10 +20,13 @@ final class ShellScriptsService {
     }
     
     /// - Parameter string: a string from project.pbxproj file.
-    /// - Returns: a tuple with a range of scripts and an array of mapped scripts.
-    func scripts(fromProjectString string: String) throws -> (Range<String.Index>, [Script]) {
-        let (range, scriptsString) = try self.scriptsString(fromProjectString: string)
-        let scanner = Scanner(string: scriptsString)
+    /// - Returns: a tuple with a range of scripts and an array of mapped scripts. If it is a new project, returns no range and empty array.
+    func scripts(fromProjectString string: String) -> (Range<String.Index>?, [Script]) {
+        let (range, scriptsString) = self.scriptsString(fromProjectString: string)
+        guard let nonEmptyScriptsString = scriptsString else {
+            return (range, [])
+        }
+        let scanner = Scanner(string: nonEmptyScriptsString)
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
@@ -49,20 +52,25 @@ final class ShellScriptsService {
         return (range, scripts)
     }
     
-    /// - Parameter scripts: an array of scripts.
+    /// - Parameters:
+    ///   - scripts: an array of scripts.
+    ///   - needSectionBlock: if true, returns whole section block
     /// - Returns: formatted string with all scripts for insertion into project.
-    func string(from scripts: [Script]) -> String {
+    func string(from scripts: [Script], needSectionBlock: Bool = false) -> String {
         let scriptStrings: [String] = scripts.map { $0.description }
-        return scriptStrings.joined(separator: "") + "\n"
+        var scriptString = scriptStrings.joined(separator: "") + "\n"
+        if needSectionBlock {
+            scriptString = Keys.buildPhaseSectionBegin + scriptString + Keys.buildPhaseSectionEnd
+        }
+        return scriptString
     }
     
     /// - Parameter projectString: a string from project.pbxproj file.
-    /// - Returns: a tuple with scripts range and scripts section string.
-    /// - Throws: an error if there is no scripts section in project string.
-    private func scriptsString(fromProjectString string: String) throws -> (Range<String.Index>, String) {
+    /// - Returns: a tuple with scripts range and scripts section string. If it is a new project, returns nils.
+    private func scriptsString(fromProjectString string: String) -> (Range<String.Index>?, String?) {
         guard let startRange = string.range(of: Keys.buildPhaseSectionBegin),
             let endRange = string.range(of: Keys.buildPhaseSectionEnd) else {
-                throw Error.noScripts
+                return (nil, nil)
         }
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
         return (scriptsRange, string.substring(with: scriptsRange))

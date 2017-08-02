@@ -13,6 +13,7 @@ final class ProjectService {
     enum Error: Swift.Error {
         case noProjectFile
         case cannotReadProject
+        case cannotFindProjectResources
     }
     
     enum PathType {
@@ -26,6 +27,7 @@ final class ProjectService {
         static let outputPath = "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/"
         static let projectExtension = "xcodeproj"
         static let frameworkExtension = "framework"
+        static let resourcesBuildSectionEnd = "/* End PBXResourcesBuildPhase section */"
     }
     
     let fileManager: FileManager
@@ -59,7 +61,7 @@ final class ProjectService {
                 throw Error.cannotReadProject
         }
         let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
-        let (scriptsRange, scripts) = try shellScriptsService.scripts(fromProjectString: body)
+        let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
         let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
         
         return Project(name: projectFileName,
@@ -75,15 +77,29 @@ final class ProjectService {
     /// - Parameter project: a project for updating.
     /// - Throws: throws if it can not white a project to project file.
     func update(_ project: Project) throws {
-        let newScriptsProjectString = project.body.replacingCharacters(in: project.scriptsRange,
+        let newScriptsProjectString: String
+        if let scriptsRange = project.scriptsRange {
+            newScriptsProjectString = project.body.replacingCharacters(in: scriptsRange,
                                                                        with: shellScriptsService.string(from: project.scripts))
+        }
+        else if let range = project.body.range(of: Keys.resourcesBuildSectionEnd) {
+            var body = project.body
+            let scriptsString = shellScriptsService.string(from: project.scripts,
+                                                           needSectionBlock: true)
+            body.insert(contentsOf: "\n\n\(scriptsString)".characters,
+                        at: range.upperBound)
+            newScriptsProjectString = body
+        }
+        else {
+            throw Error.cannotFindProjectResources
+        }
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
         
         let path = fileManager.currentDirectoryPath + "/\(project.name)" + Keys.projectPath
         try newTargetsProjectString.write(toFile: path,
-                         atomically: true,
-                         encoding: .utf8)
+                                          atomically: true,
+                                          encoding: .utf8)
     }
     
     /// - Parameters:
@@ -130,6 +146,7 @@ extension ProjectService.Error: LocalizedError {
         switch self {
         case .noProjectFile: return "Can't find any .pbxproj file."
         case .cannotReadProject: return "Can't read a project."
+        case .cannotFindProjectResources: return "Can't fine Resources section in a project."
         }
     }
 }
