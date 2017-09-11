@@ -86,8 +86,8 @@ final class ShellScriptsService {
         while !scanner.isAtEnd {
             scanner.scanUpTo(" = ", into: &key)
             scanner.scanString("= ", into: nil)
-            scanner.scanUpTo(";", into: &value)
-            scanner.scanString(";", into: nil)
+            scanner.scanUpTo(";\n", into: &value)
+            scanner.scanString(";\n", into: nil)
             if let key = key as String?, let value = value as String? {
                 body[key] = value
             }
