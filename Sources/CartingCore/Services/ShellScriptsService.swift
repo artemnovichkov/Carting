@@ -116,7 +116,8 @@ final class ShellScriptsService {
                           outputPaths: outputPaths,
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
-                          shellScript: shellScript)
+                          shellScript: shellScript,
+                          showEnvVarsInLog: body["showEnvVarsInLog"])
     }
 }
 

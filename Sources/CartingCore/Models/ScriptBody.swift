@@ -15,6 +15,7 @@ final class ScriptBody: BaseScriptBody {
     var outputPaths: String
     var shellPath: String
     var shellScript: String
+    var showEnvVarsInLog: String?
     
     var description: String {
         var string = "\t\t\tisa = \(isa);\n"
@@ -30,6 +31,9 @@ final class ScriptBody: BaseScriptBody {
         string += "\t\t\trunOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);\n"
         string += "\t\t\tshellPath = \(shellPath);\n"
         string += "\t\t\tshellScript = \(shellScript);\n"
+        if let showEnvVarsInLog = showEnvVarsInLog {
+            string += "\t\t\tshowEnvVarsInLog = \(showEnvVarsInLog);\n"
+        }
         return string
     }
     
@@ -41,12 +45,14 @@ final class ScriptBody: BaseScriptBody {
          outputPaths: String = "(\n\t\t\t)",
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
-         shellScript: String = "\"\"") {
+         shellScript: String = "\"\"",
+         showEnvVarsInLog: String? = nil) {
         self.inputPaths = inputPaths
         self.name = name
         self.outputPaths = outputPaths
         self.shellPath = shellPath
         self.shellScript = shellScript
+        self.showEnvVarsInLog = showEnvVarsInLog
         super.init(isa: isa,
                    buildActionMask: buildActionMask,
                    files: files,
