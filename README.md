@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/make-compatible-brightgreen.svg?style=flat" alt="Make" />
+    <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
   </a>
@@ -31,9 +31,15 @@ If there is no script with the name, Carting will add a new one.
 
 ## Installing
 
+### Homebrew (recommended):
+
+```bash
+$ brew install artemnovichkov/projects/carting
+```
+
 ### Make:
 
-```
+```bash
 $ git clone https://github.com/artemnovichkov/carting.git
 $ cd Carting
 $ make
@@ -41,7 +47,7 @@ $ make
 
 ### Swift Package Manager:
 
-```
+```bash
 $ git clone https://github.com/artemnovichkov/carting.git
 $ cd Carting
 $ swift build -c release -Xswiftc -static-stdlib
