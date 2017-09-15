@@ -1,9 +1,14 @@
-INSTALL_PATH = /usr/local/bin/carting
+BINARY?=carting
+BUILD_FOLDER?=.build
+OS?=sierra
+PREFIX?=/usr/local
+PROJECT?=Carting
+RELEASE_BINARY_FOLDER?=$(BUILD_FOLDER)/release/$(PROJECT)
+VERSION?=1.2.4
 
-install:
+build:
 	swift package --enable-prefetching update
 	swift build --enable-prefetching -c release -Xswiftc -static-stdlib
-	cp -f .build/release/Carting $(INSTALL_PATH)
 
-uninstall:
-	rm -f $(INSTALL_PATH)
+install: build
+	cp -f $(RELEASE_BINARY_FOLDER) $(PREFIX)/bin/$(BINARY)
