@@ -1,5 +1,5 @@
 <p align="center">
-<img src="Logo.png" width="480" max-width="90%" alt="Marathon" />
+<img src=".github/Logo.png" width="480" max-width="90%" alt="Carting" />
 </p>
 
 <p align="center">
@@ -13,6 +13,10 @@
 </p>
 
 Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting does it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
+
+<p align="center">
+<img src=".github/carting.gif" width="480" max-width="90%" alt="Carting usage" />
+</p>
 
 ## Using
 
