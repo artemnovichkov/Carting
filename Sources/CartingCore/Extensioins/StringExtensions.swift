@@ -23,4 +23,8 @@ extension String {
         
         return randomString
     }
+    
+    static var tripleTab: String {
+        return "\t\t\t"
+    }
 }

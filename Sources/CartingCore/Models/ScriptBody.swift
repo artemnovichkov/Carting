@@ -18,23 +18,23 @@ final class ScriptBody: BaseScriptBody {
     var showEnvVarsInLog: String?
     
     var description: String {
-        var string = "\t\t\tisa = \(isa);\n"
-        string += "\t\t\tbuildActionMask = \(buildActionMask);\n"
-        string += "\t\t\tfiles = (\n"
+        var components = [.tripleTab + "isa = \(isa);"]
+        components.append(.tripleTab + "buildActionMask = \(buildActionMask);")
+        components.append(.tripleTab + "files = (")
         files.forEach { file in
-            string += "\t\t\t\t\(file.identifier) /* \(file.name) in \(file.folder) */,\n"
+            components.append(String.tripleTab + "\t\(file.identifier) /* \(file.name) in \(file.folder) */,")
         }
-        string += "\t\t\t);\n"
-        string += "\t\t\tinputPaths = \(inputPaths);\n"
-        string += "\t\t\tname = \(name);\n"
-        string += "\t\t\toutputPaths = \(outputPaths);\n"
-        string += "\t\t\trunOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);\n"
-        string += "\t\t\tshellPath = \(shellPath);\n"
-        string += "\t\t\tshellScript = \(shellScript);\n"
+        components.append(.tripleTab + ");")
+        components.append(.tripleTab + "inputPaths = \(inputPaths);")
+        components.append(.tripleTab + "name = \(name);")
+        components.append(.tripleTab + "outputPaths = \(outputPaths);")
+        components.append(.tripleTab + "runOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);")
+        components.append(.tripleTab + "shellPath = \(shellPath);")
+        components.append(.tripleTab + "shellScript = \(shellScript);")
         if let showEnvVarsInLog = showEnvVarsInLog {
-            string += "\t\t\tshowEnvVarsInLog = \(showEnvVarsInLog);\n"
+            components.append(.tripleTab + "showEnvVarsInLog = \(showEnvVarsInLog);\n")
         }
-        return string
+        return components.joined(separator: "\n")
     }
     
     init(isa: String = "PBXShellScriptBuildPhase",

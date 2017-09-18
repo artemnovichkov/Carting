@@ -133,9 +133,9 @@ final class ProjectService {
     private func decription(forPaths paths: [String]) -> String {
         var string = "(\n"
         paths.forEach { path in
-            string += "\t\t\t\t\"\(path)\",\n"
+            string += .tripleTab + "\t\"\(path)\",\n"
         }
-        string += "\t\t\t)"
+        string += .tripleTab + ")"
         return string
     }
 }

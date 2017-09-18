@@ -20,20 +20,20 @@ final class TargetBody {
     let productType: String
     
     var description: String {
-        var string = "\t\t\tisa = \(isa);\n"
-        string += "\t\t\tbuildConfigurationList = \(buildConfigurationList);\n"
-        string += "\t\t\tbuildPhases = (\n"
+        var components = [.tripleTab + "isa = \(isa);"]
+        components.append(.tripleTab + "buildConfigurationList = \(buildConfigurationList);")
+        components.append(.tripleTab + "buildPhases = (")
         buildPhases.forEach { phase in
-            string += "\t\t\t\t\(phase.description),\n"
+            components.append(.tripleTab + "\t\(phase.description),")
         }
-        string += "\t\t\t);\n"
-        string += "\t\t\tbuildRules = \(buildRules);\n"
-        string += "\t\t\tdependencies = \(dependencies);\n"
-        string += "\t\t\tname = \(name);\n"
-        string += "\t\t\tproductName = \(productName);\n"
-        string += "\t\t\tproductReference = \(productReference);\n"
-        string += "\t\t\tproductType = \(productType);\n"
-        return string
+        components.append(.tripleTab + ");")
+        components.append(.tripleTab + "buildRules = \(buildRules);")
+        components.append(.tripleTab + "dependencies = \(dependencies);")
+        components.append(.tripleTab + "name = \(name);")
+        components.append(.tripleTab + "productName = \(productName);")
+        components.append(.tripleTab + "productReference = \(productReference);")
+        components.append(.tripleTab + "productType = \(productType);\n")
+        return components.joined(separator: "\n")
     }
     
     init(isa: String,
