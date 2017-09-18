@@ -67,9 +67,9 @@ $ cp -f .build/release/Carting /usr/local/bin/carting
  - [x] Add option for adding new script
  - [x] Add support of multiple targets
  - [x] Add check of linked frameworks
+ - [x] Unify errors
  - [ ] Add support of tvOS and watchOS platforms
  - [ ] Check correct work with workspaces
- - [ ] Unify errors
  - [ ] Write tests
 
 ## Author
