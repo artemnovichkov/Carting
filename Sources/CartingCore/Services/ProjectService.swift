@@ -15,6 +15,7 @@ final class ProjectService {
         case noProjectFile
         case cannotReadProject
         case cannotFindProjectResources
+        case cannotUpdateProject
     }
     
     enum PathType {
@@ -102,9 +103,14 @@ final class ProjectService {
                                                                                   with: targetsService.string(from: project.targets))
         
         let path = fileManager.currentDirectoryPath + "/\(project.name)" + Keys.projectPath
-        try newTargetsProjectString.write(toFile: path,
-                                          atomically: true,
-                                          encoding: .utf8)
+        do {
+            try newTargetsProjectString.write(toFile: path,
+                                              atomically: true,
+                                              encoding: .utf8)
+        }
+        catch {
+            throw Error.cannotUpdateProject
+        }
     }
     
     /// - Parameters:
@@ -157,6 +163,7 @@ extension ProjectService.Error: LocalizedError {
         case .noProjectFile: return "Can't find project file."
         case .cannotReadProject: return "Can't read the project."
         case .cannotFindProjectResources: return "Can't fine Resources section in the project."
+        case .cannotUpdateProject: return "Can't update the project."
         }
     }
 }
