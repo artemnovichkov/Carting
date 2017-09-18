@@ -28,12 +28,8 @@ public final class Carting {
         let carthageScriptName = arguments.count > 1 ? arguments[1] : Keys.defaultScriptName
         
         try project.targets.forEach { target in
-            let frameworkBuildPhase = target.body.buildPhases
-                .filter { $0.name == "Frameworks" }
-                .first
-            let frameworkScript = project.frameworkScripts
-                .filter { $0.identifier == frameworkBuildPhase?.identifier }
-                .first
+            let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
+            let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
             guard let script = frameworkScript else {
                 return
             }
@@ -42,12 +38,8 @@ public final class Carting {
                 .filter { carthageFrameworkNames.contains($0.name) }
                 .map { $0.name }
             
-            let carthageBuildPhase = target.body.buildPhases
-                .filter { $0.name == carthageScriptName }
-                .first
-            let carthageScript = project.scripts
-                .filter { $0.identifier == carthageBuildPhase?.identifier }
-                .first
+            let carthageBuildPhase = target.body.buildPhases.first { $0.name == carthageScriptName }
+            let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
             
             let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
                                                               type: .input)
