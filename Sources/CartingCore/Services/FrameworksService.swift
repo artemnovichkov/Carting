@@ -10,7 +10,7 @@ import Foundation
 final class FrameworksService {
     
     enum Error: Swift.Error {
-        case noFrameworks
+        case frameworksReadingFailed
     }
     
     private enum Keys {
@@ -54,7 +54,7 @@ final class FrameworksService {
     private func scriptsString(fromProjectString string: String) throws -> (Range<String.Index>, String) {
         guard let startRange = string.range(of: Keys.frameworkPhaseSectionBegin),
             let endRange = string.range(of: Keys.frameworkPhaseSectionEnd) else {
-                throw Error.noFrameworks
+                throw Error.frameworksReadingFailed
         }
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
         return (scriptsRange, string.substring(with: scriptsRange))
@@ -98,7 +98,7 @@ extension FrameworksService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .noFrameworks: return "Can't find frameworks section in project."
+        case .frameworksReadingFailed: return "Can't find frameworks section in project."
         }
     }
 }

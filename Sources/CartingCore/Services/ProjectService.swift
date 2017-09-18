@@ -11,11 +11,11 @@ import Foundation
 final class ProjectService {
     
     enum Error: Swift.Error {
-        case cannotGetContentsOfDirectory(path: String)
-        case noProjectFile
-        case cannotReadProject
-        case cannotFindProjectResources
-        case cannotUpdateProject
+        case contentsOfDirectoryReadingFailed(path: String)
+        case projectFileReadingFailed
+        case projectReadingFailed
+        case projectResourcesReadingFailed
+        case projectUpdatingFailed
     }
     
     enum PathType {
@@ -55,12 +55,12 @@ final class ProjectService {
             let fileNames = try fileManager.contentsOfDirectory(atPath: path)
             let fileName = fileNames.first { $0.hasSuffix(Keys.projectExtension) }
             guard let projectFileName = fileName else {
-                throw Error.noProjectFile
+                throw Error.projectFileReadingFailed
             }
             let path = fileManager.currentDirectoryPath + "/\(projectFileName)" + Keys.projectPath
             guard let data = fileManager.contents(atPath: path),
                 let body = String(data: data, encoding: .utf8) else {
-                    throw Error.cannotReadProject
+                    throw Error.projectReadingFailed
             }
             let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
             let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
@@ -75,7 +75,7 @@ final class ProjectService {
                            frameworkScripts: frameworkScripts)
         }
         catch {
-            throw Error.cannotGetContentsOfDirectory(path: path)
+            throw Error.contentsOfDirectoryReadingFailed(path: path)
         }
     }
     
@@ -97,7 +97,7 @@ final class ProjectService {
             newScriptsProjectString = body
         }
         else {
-            throw Error.cannotFindProjectResources
+            throw Error.projectResourcesReadingFailed
         }
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
@@ -109,7 +109,7 @@ final class ProjectService {
                                               encoding: .utf8)
         }
         catch {
-            throw Error.cannotUpdateProject
+            throw Error.projectUpdatingFailed
         }
     }
     
@@ -141,7 +141,7 @@ final class ProjectService {
             return fileNames.filter { $0.hasSuffix(Keys.frameworkExtension) }
         }
         catch {
-            throw Error.cannotGetContentsOfDirectory(path: path)
+            throw Error.contentsOfDirectoryReadingFailed(path: path)
         }
     }
     
@@ -159,11 +159,11 @@ extension ProjectService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .cannotGetContentsOfDirectory(let path): return "Can't get content of directory at path \(path)."
-        case .noProjectFile: return "Can't find project file."
-        case .cannotReadProject: return "Can't read the project."
-        case .cannotFindProjectResources: return "Can't fine Resources section in the project."
-        case .cannotUpdateProject: return "Can't update the project."
+        case .contentsOfDirectoryReadingFailed(let path): return "Can't get content of directory at path \(path)."
+        case .projectFileReadingFailed: return "Can't find project file."
+        case .projectReadingFailed: return "Can't read the project."
+        case .projectResourcesReadingFailed: return "Can't fine Resources section in the project."
+        case .projectUpdatingFailed: return "Can't update the project."
         }
     }
 }

@@ -11,7 +11,7 @@ import Foundation
 final class ShellScriptsService {
     
     enum Error: Swift.Error {
-        case noScripts
+        case scriptsReadingFailed
     }
     
     private enum Keys {
@@ -125,7 +125,7 @@ extension ShellScriptsService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .noScripts: return "Can't find script section in project."
+        case .scriptsReadingFailed: return "Can't find script section in project."
         }
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 final class TargetsService {
     
     enum Error: Swift.Error {
-        case noTargets
+        case targetsReadingFailed
     }
     
     private enum Keys {
@@ -62,7 +62,7 @@ final class TargetsService {
         guard
             let targetsStartRange = projectString.range(of: Keys.targetSectionBegin),
             let targetsEndRange = projectString.range(of: Keys.targetSectionEnd) else {
-                throw Error.noTargets
+                throw Error.targetsReadingFailed
         }
         
         let targetsRange = targetsStartRange.upperBound..<targetsEndRange.lowerBound
@@ -140,7 +140,7 @@ extension TargetsService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .noTargets: return "Can't find target section in project."
+        case .targetsReadingFailed: return "Can't find target section in project."
         }
     }
 }
