@@ -49,11 +49,23 @@ public final class Carting {
                                                                type: .output)
             
             if let carthage = carthageScript {
-                carthage.body.inputPaths = inputPathsString
-                carthage.body.outputPaths = outputPathsString
-                carthage.body.shellScript = Keys.carthageScript
-                print("✅ Script \"\(carthageScriptName)\" in target \"\(target.name)\" was successfully updated.")
-                projectHasBeenUpdated = true
+                var scriptHasBeenUpdated = false
+                if carthage.body.inputPaths != inputPathsString {
+                   carthage.body.inputPaths = inputPathsString
+                    scriptHasBeenUpdated = true
+                }
+                if carthage.body.outputPaths != outputPathsString {
+                    carthage.body.outputPaths = outputPathsString
+                    scriptHasBeenUpdated = true
+                }
+                if carthage.body.shellScript != Keys.carthageScript {
+                    carthage.body.shellScript = Keys.carthageScript
+                    scriptHasBeenUpdated = true
+                }
+                if scriptHasBeenUpdated {
+                    projectHasBeenUpdated = true
+                    print("✅ Script \"\(carthageScriptName)\" in target \"\(target.name)\" was successfully updated.")
+                }
             }
             else if linkedCarthageFrameworkNames.count > 0 {
                 let body = ScriptBody(inputPaths: inputPathsString,
