@@ -11,6 +11,7 @@ import Foundation
 final class ProjectService {
     
     enum Error: Swift.Error {
+        case cannotGetContentsOfDirectory(path: String)
         case noProjectFile
         case cannotReadProject
         case cannotFindProjectResources
@@ -48,29 +49,33 @@ final class ProjectService {
     /// - Returns: a Project instance from current directory.
     /// - Throws: an error if there is no any projects.
     func project() throws -> Project {
-        let fileNames = try fileManager.contentsOfDirectory(atPath: fileManager.currentDirectoryPath)
-        let projectFileNames = fileNames.filter { file in
-            return file.hasSuffix(Keys.projectExtension)
+        let path = fileManager.currentDirectoryPath
+        do {
+            let fileNames = try fileManager.contentsOfDirectory(atPath: path)
+            let fileName = fileNames.first { $0.hasSuffix(Keys.projectExtension) }
+            guard let projectFileName = fileName else {
+                throw Error.noProjectFile
+            }
+            let path = fileManager.currentDirectoryPath + "/\(projectFileName)" + Keys.projectPath
+            guard let data = fileManager.contents(atPath: path),
+                let body = String(data: data, encoding: .utf8) else {
+                    throw Error.cannotReadProject
+            }
+            let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
+            let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
+            let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
+            
+            return Project(name: projectFileName,
+                           body: body,
+                           targetsRange: targetsRange,
+                           targets: targets,
+                           scriptsRange: scriptsRange,
+                           scripts: scripts,
+                           frameworkScripts: frameworkScripts)
         }
-        guard let projectFileName = projectFileNames.first else {
-            throw Error.noProjectFile
+        catch {
+            throw Error.cannotGetContentsOfDirectory(path: path)
         }
-        let path = fileManager.currentDirectoryPath + "/\(projectFileName)" + Keys.projectPath
-        guard let data = fileManager.contents(atPath: path),
-            let body = String(data: data, encoding: .utf8) else {
-                throw Error.cannotReadProject
-        }
-        let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
-        let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
-        let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
-        
-        return Project(name: projectFileName,
-                       body: body,
-                       targetsRange: targetsRange,
-                       targets: targets,
-                       scriptsRange: scriptsRange,
-                       scripts: scripts,
-                       frameworkScripts: frameworkScripts)
     }
     
     
@@ -124,9 +129,13 @@ final class ProjectService {
     /// - Returns: an array of iOS frameworks names built by Carthage.
     /// - Throws: ar error if there is no Carthage folder.
     func frameworkNames() throws -> [String] {
-        let fileNames = try fileManager.contentsOfDirectory(atPath: fileManager.currentDirectoryPath + Keys.carthagePath)
-        return fileNames.filter { file in
-            return file.hasSuffix(Keys.frameworkExtension)
+        let path = fileManager.currentDirectoryPath + Keys.carthagePath
+        do {
+            let fileNames = try fileManager.contentsOfDirectory(atPath: path)
+            return fileNames.filter { $0.hasSuffix(Keys.frameworkExtension) }
+        }
+        catch {
+            throw Error.cannotGetContentsOfDirectory(path: path)
         }
     }
     
@@ -144,9 +153,10 @@ extension ProjectService.Error: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .noProjectFile: return "Can't find any .pbxproj file."
-        case .cannotReadProject: return "Can't read a project."
-        case .cannotFindProjectResources: return "Can't fine Resources section in a project."
+        case .cannotGetContentsOfDirectory(let path): return "Can't get content of directory at path \(path)."
+        case .noProjectFile: return "Can't find project file."
+        case .cannotReadProject: return "Can't read the project."
+        case .cannotFindProjectResources: return "Can't fine Resources section in the project."
         }
     }
 }
