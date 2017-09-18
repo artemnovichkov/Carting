@@ -30,9 +30,12 @@ final class ScriptBody: BaseScriptBody {
         components.append(.tripleTab + "outputPaths = \(outputPaths);")
         components.append(.tripleTab + "runOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);")
         components.append(.tripleTab + "shellPath = \(shellPath);")
-        components.append(.tripleTab + "shellScript = \(shellScript);")
         if let showEnvVarsInLog = showEnvVarsInLog {
+            components.append(.tripleTab + "shellScript = \(shellScript);")
             components.append(.tripleTab + "showEnvVarsInLog = \(showEnvVarsInLog);\n")
+        }
+        else {
+            components.append(.tripleTab + "shellScript = \(shellScript);\n")
         }
         return components.joined(separator: "\n")
     }
