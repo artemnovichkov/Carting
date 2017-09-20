@@ -69,7 +69,7 @@ final class ShellScriptsService {
                 return (nil, nil)
         }
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
-        return (scriptsRange, string.substring(with: scriptsRange))
+        return (scriptsRange, String(string[scriptsRange]))
     }
     
     /// - Parameter string: a string of script body from curly braces.
