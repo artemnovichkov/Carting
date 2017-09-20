@@ -1,9 +1,7 @@
-import CartingCore
-
 let carting = Carting()
 
 do {
-    try carting.run()
+    try carting.runTest()
 }
 catch {
     print("❌ \(error.localizedDescription)")
