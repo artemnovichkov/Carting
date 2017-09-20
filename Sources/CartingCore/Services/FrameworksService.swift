@@ -1,7 +1,4 @@
 //
-//  FrameworksService.swift
-//  Carting
-//
 //  Created by Artem Novichkov on 08/07/2017.
 //
 
@@ -57,7 +54,7 @@ final class FrameworksService {
                 throw Error.frameworksReadingFailed
         }
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
-        return (scriptsRange, string.substring(with: scriptsRange))
+        return (scriptsRange, String(string[scriptsRange]))
     }
     
     /// - Parameter string: a string of script body from curly braces.

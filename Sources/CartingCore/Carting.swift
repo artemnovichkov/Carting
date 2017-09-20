@@ -1,7 +1,4 @@
 //
-//  Carting.swift
-//  Carting
-//
 //  Created by Artem Novichkov on 01/07/2017.
 //
 

@@ -1,7 +1,4 @@
 //
-//  TargetsService.swift
-//  Carting
-//
 //  Created by Artem Novichkov on 04/07/2017.
 //
 
@@ -66,7 +63,7 @@ final class TargetsService {
         }
         
         let targetsRange = targetsStartRange.upperBound..<targetsEndRange.lowerBound
-        return (targetsRange, projectString.substring(with: targetsRange))
+        return (targetsRange, String(projectString[targetsRange]))
     }
     
     /// - Parameter string: a string of target body from curly braces.

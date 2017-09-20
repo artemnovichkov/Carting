@@ -1,14 +1,14 @@
-// swift-tools-version:3.1
-
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
     name: "Carting",
     targets: [
-        Target(
+        .target(
             name: "Carting",
-            dependencies: ["CartingCore"]
-        ),
-        Target(name: "CartingCore")
+            dependencies: ["CartingCore"]),
+        .target(
+            name: "CartingCore",
+            path: "./Sources/CartingCore"),
     ]
 )
