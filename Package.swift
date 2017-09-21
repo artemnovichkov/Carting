@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Carting",
     targets: [
-        .target(name: "Carting"),
+        .target(name: "Carting", dependencies: ["CartingCore"]),
         .target(name: "CartingCore")
-        ],
-    swiftLanguageVersions: [4]
+        ]
 )
