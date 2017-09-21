@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Carting",
     products: [
-        .library(name: "CartingCore", targets: ["CartingCore"]),
+        .library(name: "Carting", targets: ["CartingCore"]),
         ],
     targets: [
         .target(name: "Carting", dependencies: ["CartingCore"]),
