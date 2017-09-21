@@ -4,12 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "Carting",
-    products: [
-        .library(name: "Carting", targets: ["Carting"]),
-        ],
     targets: [
-        .target(name: "Carting", path: "Sources/Carting"),
-        .target(name: "CartingCore", path: "./Sources/CartingCore")
+        .target(name: "Carting"),
+        .target(name: "CartingCore")
         ],
     swiftLanguageVersions: [4]
 )
