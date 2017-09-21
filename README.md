@@ -53,11 +53,21 @@ $ make
 
 ### Swift Package Manager:
 
-```bash
-$ git clone https://github.com/artemnovichkov/carting.git
-$ cd Carting
-$ swift build -c release -Xswiftc -static-stdlib
-$ cp -f .build/release/Carting /usr/local/bin/carting
+```swift
+// swift-tools-version:4.0
+
+import PackageDescription
+
+let package = Package(
+    name: "Project",
+    dependencies: [
+    .package(url: "https://github.com/artemnovichkov/Carting.git", from: "1.0.0"),
+        ],
+    targets: [
+        .target(
+            name: "Project", dependencies: ["Carting"])
+    ]
+)
 ```
 ### Marathon
 
