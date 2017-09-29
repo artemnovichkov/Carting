@@ -1,6 +1,6 @@
 *.yml linguist-generated
 *.sh linguist-generated
 *.podspec linguist-generated
-^Makefile linguist-generated
+Makefile linguist-generated
 
 *.md linguist-documentation
