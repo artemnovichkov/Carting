@@ -20,12 +20,15 @@ public final class Carting {
     }
     
     public func run() throws {
-        let project = try projectService.project()
-        
         let carthageScriptName = arguments.count > 1 ? arguments[1] : Keys.defaultScriptName
-        
+        try updateScript(withName: carthageScriptName)
+    }
+
+    private func updateScript(withName scriptName: String) throws {
+        let project = try projectService.project()
+
         var projectHasBeenUpdated = false
-        
+
         try project.targets.forEach { target in
             let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
             let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
@@ -36,19 +39,19 @@ public final class Carting {
             let linkedCarthageFrameworkNames = script.body.files
                 .filter { carthageFrameworkNames.contains($0.name) }
                 .map { $0.name }
-            
-            let carthageBuildPhase = target.body.buildPhases.first { $0.name == carthageScriptName }
+
+            let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
             let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
-            
+
             let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
                                                               type: .input)
             let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
                                                                type: .output)
-            
+
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
                 if carthage.body.inputPaths != inputPathsString {
-                   carthage.body.inputPaths = inputPathsString
+                    carthage.body.inputPaths = inputPathsString
                     scriptHasBeenUpdated = true
                 }
                 if carthage.body.outputPaths != outputPathsString {
@@ -61,25 +64,25 @@ public final class Carting {
                 }
                 if scriptHasBeenUpdated {
                     projectHasBeenUpdated = true
-                    print("✅ Script \"\(carthageScriptName)\" in target \"\(target.name)\" was successfully updated.")
+                    print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
                 }
             }
             else if linkedCarthageFrameworkNames.count > 0 {
                 let body = ScriptBody(inputPaths: inputPathsString,
-                                      name: carthageScriptName,
+                                      name: scriptName,
                                       outputPaths: outputPathsString,
                                       shellScript: Keys.carthageScript)
-                
+
                 let identifier = String.randomAlphaNumericString(length: 24)
-                let script = Script(identifier: identifier, name: carthageScriptName, body: body)
-                let buildPhase = BuildPhase(identifier: identifier, name: carthageScriptName)
+                let script = Script(identifier: identifier, name: scriptName, body: body)
+                let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
                 project.scripts.append(script)
                 target.body.buildPhases.append(buildPhase)
-                print("✅ Script \(carthageScriptName) was successfully added to \(target.name) target.")
+                print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                 projectHasBeenUpdated = true
             }
         }
-        
+
         try projectService.update(project)
         if !projectHasBeenUpdated {
             print("🤷‍♂️ Nothing to update.")
