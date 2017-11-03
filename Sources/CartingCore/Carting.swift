@@ -32,6 +32,8 @@ public final class Carting {
             try updateScript(withName: name)
         case let .link(name: name):
             try linkFramework(withName: name)
+        case let .unlink(name: name):
+            try unlinkFramework(withName: name)
         }
     }
 
@@ -101,6 +103,10 @@ public final class Carting {
     }
 
     private func linkFramework(withName frameworkName: String) throws {
+        //TODO: Add the framework with specified name to the project.
+    }
+
+    private func unlinkFramework(withName frameworkName: String) throws {
         //TODO: Add the framework with specified name to the project.
     }
 }

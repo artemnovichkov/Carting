@@ -7,7 +7,7 @@ import Foundation
 struct Arguments {
 
     enum Command {
-        case script(name: String), link(name: String), help
+        case script(name: String), link(name: String), unlink(name: String), help
     }
 
     private enum Keys {
@@ -29,6 +29,12 @@ struct Arguments {
                     return nil
                 }
                 command = .link(name: arguments[frameworkNameIndex])
+            case "-u", "--unlink":
+                let frameworkNameIndex = index + 1
+                guard arguments.count > frameworkNameIndex else {
+                    return nil
+                }
+                command = .unlink(name: arguments[frameworkNameIndex])
             case "help":
                 command = .help
             default: break
@@ -43,6 +49,8 @@ Usage: carting [options]
       Update the script with specified name.
   -l, --link:
       Link the framework with specified name to every target.
+  -u, --unlink:
+      Unlink the framework with specified name to every target.
 """
     }()
 }
