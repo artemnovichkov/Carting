@@ -7,7 +7,6 @@ import Foundation
 public final class Carting {
     
     enum Keys {
-        static let defaultScriptName = "Carthage"
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
     
@@ -20,8 +19,20 @@ public final class Carting {
     }
     
     public func run() throws {
-        let carthageScriptName = arguments.count > 1 ? arguments[1] : Keys.defaultScriptName
-        try updateScript(withName: carthageScriptName)
+        guard let arguments = Arguments(arguments: self.arguments) else {
+            print("❌ Wrong arguments")
+            print(Arguments.description)
+            return
+        }
+
+        switch arguments.command {
+        case .help:
+            print(Arguments.description)
+        case let .script(name: name):
+            try updateScript(withName: name)
+        case let .link(name: name):
+            try linkFramework(withName: name)
+        }
     }
 
     private func updateScript(withName scriptName: String) throws {
@@ -87,6 +98,10 @@ public final class Carting {
         if !projectHasBeenUpdated {
             print("🤷‍♂️ Nothing to update.")
         }
+    }
+
+    private func linkFramework(withName frameworkName: String) throws {
+        //TODO: Add the framework with specified name to the project.
     }
 }
 
