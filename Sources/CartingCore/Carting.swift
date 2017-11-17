@@ -31,7 +31,8 @@ public final class Carting {
 //        case let .script(name: name):
 //            try updateScript(withName: name)
 //        case .list:
-            FrameworkInformationService().printFrameworksList()
+//            FrameworkInformationService().printFrameworksInformation()
+        try FrameworkInformationService().convertFrameworkToStatic(withName: "Alamofire")
 //        }
     }
 

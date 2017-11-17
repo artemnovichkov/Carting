@@ -4,10 +4,11 @@
 
 import Files
 import ShellOut
+import Foundation
 
 class FrameworkInformationService {
 
-    func printFrameworksList() {
+    func printFrameworksInformation() {
         do {
             let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS")
             let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
@@ -33,6 +34,33 @@ class FrameworkInformationService {
                                     architectures: architectures(fromOutput: rawArchitectures),
                                     linking: linking(fromOutput: fileOutput))
     }
+
+    func convertFrameworkToStatic(withName name: String) throws {
+        let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS/\(name).framework")
+        let configPath = "/tmp/static.xcconfig"
+        let configFile = try FileSystem().createFile(at: configPath)
+        let content = "MACH_O_TYPE = staticlib"
+        try configFile.write(string: content)
+        setenv("XCODE_XCCONFIG_FILE", configPath, 1)
+
+//        let output = try shellOut(to: "export", arguments: ["XCODE_XCCONFIG_FILE=\"\(configPath)\""])
+//        print(output)
+        try shellOut(to: "/usr/local/bin/carthage build", arguments: [frameworkFolder.nameExcludingExtension])
+
+//        let process = Process()
+//        process.environment = ["XCODE_XCCONFIG_FILE": configPath]
+//        process.launchPath = "/bin/bash"
+//        process.arguments = ["-c", "usr/local/bin/carthage build", frameworkFolder.nameExcludingExtension]
+//        process.launch()
+//        process.waitUntilExit()
+
+        print("Done!")
+    }
+}
+
+func getEnvironmentVar(_ name: String) -> String? {
+    guard let rawValue = getenv(name) else { return nil }
+    return String(utf8String: rawValue)
 }
 
 struct FrameworkInformation {
