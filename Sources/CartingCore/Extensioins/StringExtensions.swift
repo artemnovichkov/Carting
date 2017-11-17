@@ -8,7 +8,7 @@ extension String {
     
     static func randomAlphaNumericString(length: Int) -> String {
         let allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        let allowedCharsCount = UInt32(allowedChars.characters.count)
+        let allowedCharsCount = UInt32(allowedChars.count)
         var randomString = ""
         
         for _ in 0..<length {
