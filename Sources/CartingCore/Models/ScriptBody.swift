@@ -45,7 +45,7 @@ final class ScriptBody: BaseScriptBody {
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
          shellScript: String = "\"\"",
-         showEnvVarsInLog: String? = nil) {
+         showEnvVarsInLog: String? = "0") {
         self.inputPaths = inputPaths
         self.name = name
         self.outputPaths = outputPaths
