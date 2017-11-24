@@ -8,11 +8,15 @@ import Foundation
 
 class FrameworkInformationService {
 
+    func frameworksInformation() throws -> [FrameworkInformation] {
+        let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS")
+        let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
+        return try frameworks.lazy.map(information)
+    }
+
     func printFrameworksInformation() {
         do {
-            let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS")
-            let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
-            let informations = try frameworks.map(information)
+            let informations = try frameworksInformation()
             informations.forEach { information in
                 let description = [information.name, information.linking.rawValue].joined(separator: "\t\t") +
                     "\t" +
@@ -35,7 +39,7 @@ class FrameworkInformationService {
                                     linking: linking(fromOutput: fileOutput))
     }
 
-    func convertFrameworkToStatic(withName name: String) throws {
+    private func convertFrameworkToStatic(withName name: String) throws {
         let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS/\(name).framework")
         let configPath = "/tmp/static.xcconfig"
         let configFile = try FileSystem().createFile(at: configPath)
