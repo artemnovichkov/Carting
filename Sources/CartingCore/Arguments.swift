@@ -19,6 +19,8 @@ struct Arguments {
     init?(arguments: [String]) {
         for (index, argument) in arguments.enumerated() {
             switch argument.lowercased() {
+            case "update":
+                command = .script(name: Keys.defaultScriptName)
             case "-s", "--script":
                 let nameIndex = index + 1
                 let name = arguments.count > nameIndex ? arguments[nameIndex] : Keys.defaultScriptName
@@ -34,11 +36,15 @@ struct Arguments {
 
     static let description: String = {
         return """
-Usage: carting [options]
+Usage: carting [command] [options]
+  update:
+      Adds a new script with input/output file paths or updates the script named `Carthage`.
+  -s, --script:
+      Updates input/output file paths for the script with passed name.
   list:
       Prints Carthage frameworks list with linking description.
-  -u, --unlink:
-      Unlink the framework with specified name to every target.
+  help:
+      Prints this message.
 """
     }()
 }
