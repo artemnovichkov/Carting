@@ -13,27 +13,27 @@ public final class Carting {
     private let arguments: [String]
 
     private let projectService = ProjectService()
+    private let frameworkInformationService = FrameworkInformationService()
 
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
     }
 
     public func run() throws {
-//        guard let arguments = Arguments(arguments: self.arguments) else {
-//            print("❌ Wrong arguments")
-//            print(Arguments.description)
-//            return
-//        }
+        guard let arguments = Arguments(arguments: self.arguments) else {
+            print("❌ Wrong arguments")
+            print(Arguments.description)
+            return
+        }
 
-//        switch arguments.command {
-//        case .help:
-//            print(Arguments.description)
-//        case let .script(name: name):
-//            try updateScript(withName: name)
-//        case .list:
-//            FrameworkInformationService().printFrameworksInformation()
-        try FrameworkInformationService().convertFrameworkToStatic(withName: "Alamofire")
-//        }
+        switch arguments.command {
+        case .help:
+            print(Arguments.description)
+        case let .script(name: name):
+            try updateScript(withName: name)
+        case .list:
+            frameworkInformationService.printFrameworksInformation()
+        }
     }
 
     private func updateScript(withName scriptName: String) throws {
