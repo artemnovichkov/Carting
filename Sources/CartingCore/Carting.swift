@@ -5,50 +5,66 @@
 import Foundation
 
 public final class Carting {
-    
+
     enum Keys {
-        static let defaultScriptName = "Carthage"
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
-    
+
     private let arguments: [String]
-    
+
     private let projectService = ProjectService()
-    
+    private let frameworkInformationService = FrameworkInformationService()
+
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
     }
-    
+
     public func run() throws {
+        guard let arguments = Arguments(arguments: self.arguments) else {
+            print("❌ Wrong arguments")
+            print(Arguments.description)
+            return
+        }
+
+        switch arguments.command {
+        case .help:
+            print(Arguments.description)
+        case let .script(name: name):
+            try updateScript(withName: name)
+        case .list:
+            frameworkInformationService.printFrameworksInformation()
+        }
+    }
+
+    private func updateScript(withName scriptName: String) throws {
         let project = try projectService.project()
-        
-        let carthageScriptName = arguments.count > 1 ? arguments[1] : Keys.defaultScriptName
-        
+
         var projectHasBeenUpdated = false
-        
+
         try project.targets.forEach { target in
             let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
             let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
             guard let script = frameworkScript else {
                 return
             }
-            let carthageFrameworkNames = try projectService.frameworkNames()
-            let linkedCarthageFrameworkNames = script.body.files
-                .filter { carthageFrameworkNames.contains($0.name) }
+            let linkedCarthageDynamicFrameworkNames = try frameworkInformationService.frameworksInformation()
+                .filter { information in
+                    information.linking == .dynamic && script.body.files.contains { $0.name == information.name }
+                }
                 .map { $0.name }
-            
-            let carthageBuildPhase = target.body.buildPhases.first { $0.name == carthageScriptName }
+
+            let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
             let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
-            
-            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+
+            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                               type: .input)
-            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                                type: .output)
-            
+
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
                 if carthage.body.inputPaths != inputPathsString {
-                   carthage.body.inputPaths = inputPathsString
+                    carthage.body.inputPaths = inputPathsString
                     scriptHasBeenUpdated = true
                 }
                 if carthage.body.outputPaths != outputPathsString {
@@ -61,25 +77,25 @@ public final class Carting {
                 }
                 if scriptHasBeenUpdated {
                     projectHasBeenUpdated = true
-                    print("✅ Script \"\(carthageScriptName)\" in target \"\(target.name)\" was successfully updated.")
+                    print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
                 }
             }
-            else if linkedCarthageFrameworkNames.count > 0 {
+            else if linkedCarthageDynamicFrameworkNames.count > 0 {
                 let body = ScriptBody(inputPaths: inputPathsString,
-                                      name: carthageScriptName,
+                                      name: scriptName,
                                       outputPaths: outputPathsString,
                                       shellScript: Keys.carthageScript)
-                
+
                 let identifier = String.randomAlphaNumericString(length: 24)
-                let script = Script(identifier: identifier, name: carthageScriptName, body: body)
-                let buildPhase = BuildPhase(identifier: identifier, name: carthageScriptName)
+                let script = Script(identifier: identifier, name: scriptName, body: body)
+                let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
                 project.scripts.append(script)
                 target.body.buildPhases.append(buildPhase)
-                print("✅ Script \(carthageScriptName) was successfully added to \(target.name) target.")
+                print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                 projectHasBeenUpdated = true
             }
         }
-        
+
         try projectService.update(project)
         if !projectHasBeenUpdated {
             print("🤷‍♂️ Nothing to update.")
@@ -92,7 +108,7 @@ enum MainError: Swift.Error {
 }
 
 extension MainError: LocalizedError {
-    
+
     var errorDescription: String? {
         switch self {
         case .noScript(name: let name): return "Can't find script with name \(name)"

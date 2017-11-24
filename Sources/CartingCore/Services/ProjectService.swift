@@ -88,7 +88,7 @@ final class ProjectService {
             var body = project.body
             let scriptsString = shellScriptsService.string(from: project.scripts,
                                                            needSectionBlock: true)
-            body.insert(contentsOf: "\n\n\(scriptsString)".characters,
+            body.insert(contentsOf: "\n\n\(scriptsString)",
                         at: range.upperBound)
             newScriptsProjectString = body
         }
@@ -134,7 +134,7 @@ final class ProjectService {
         let path = fileManager.currentDirectoryPath + Keys.carthagePath
         do {
             let fileNames = try fileManager.contentsOfDirectory(atPath: path)
-            return fileNames.filter { $0.hasSuffix(Keys.frameworkExtension) }
+            return fileNames.lazy.filter { $0.hasSuffix(Keys.frameworkExtension) }
         }
         catch {
             throw Error.contentsOfDirectoryReadingFailed(path: path)

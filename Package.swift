@@ -7,8 +7,12 @@ let package = Package(
     products: [
         .library(name: "Carting", targets: ["CartingCore"]),
         ],
+    dependencies: [
+        .package(url: "https://github.com/johnsundell/files.git", from: "2.0.0"),
+        .package(url: "https://github.com/Johnsundell/shellout.git", from: "2.0.0")
+    ],
     targets: [
         .target(name: "Carting", dependencies: ["CartingCore"]),
-        .target(name: "CartingCore")
+        .target(name: "CartingCore", dependencies: ["Files", "ShellOut"])
         ]
 )
