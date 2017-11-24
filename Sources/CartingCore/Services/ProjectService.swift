@@ -134,7 +134,7 @@ final class ProjectService {
         let path = fileManager.currentDirectoryPath + Keys.carthagePath
         do {
             let fileNames = try fileManager.contentsOfDirectory(atPath: path)
-            return fileNames.filter { $0.hasSuffix(Keys.frameworkExtension) }
+            return fileNames.lazy.filter { $0.hasSuffix(Keys.frameworkExtension) }
         }
         catch {
             throw Error.contentsOfDirectoryReadingFailed(path: path)

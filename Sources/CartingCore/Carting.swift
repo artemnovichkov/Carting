@@ -47,17 +47,18 @@ public final class Carting {
             guard let script = frameworkScript else {
                 return
             }
-            let carthageFrameworkNames = try projectService.frameworkNames()
-            let linkedCarthageFrameworkNames = script.body.files
-                .filter { carthageFrameworkNames.contains($0.name) }
+            let linkedCarthageDynamicFrameworkNames = try frameworkInformationService.frameworksInformation()
+                .filter { information in
+                    information.linking == .dynamic && script.body.files.contains { $0.name == information.name }
+                }
                 .map { $0.name }
 
             let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
             let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
-            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                               type: .input)
-            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageFrameworkNames,
+            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                                type: .output)
 
             if let carthage = carthageScript {
@@ -79,7 +80,7 @@ public final class Carting {
                     print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
                 }
             }
-            else if linkedCarthageFrameworkNames.count > 0 {
+            else if linkedCarthageDynamicFrameworkNames.count > 0 {
                 let body = ScriptBody(inputPaths: inputPathsString,
                                       name: scriptName,
                                       outputPaths: outputPathsString,

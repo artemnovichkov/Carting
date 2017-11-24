@@ -11,7 +11,7 @@ class FrameworkInformationService {
     func frameworksInformation() throws -> [FrameworkInformation] {
         let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS")
         let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
-        return try frameworks.lazy.map(information)
+        return try frameworks.map(information)
     }
 
     func printFrameworksInformation() {
