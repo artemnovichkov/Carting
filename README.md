@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-	<a href="https://dashboard.buddybuild.com/apps/59c146026a659c00011fc478/build/latest?branch=master">
-        <img src="https://dashboard.buddybuild.com/api/statusImage?appID=59c146026a659c00011fc478&branch=master&build=latest" />
+	<a href="https://travis-ci.org/artemnovichkov/swift-project-template">
+        <img src="https://travis-ci.org/artemnovichkov/swift-project-template.svg?branch=master" />
     <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
