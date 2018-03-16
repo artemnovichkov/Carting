@@ -96,8 +96,10 @@ public final class Carting {
             }
         }
 
-        try projectService.update(project)
-        if !projectHasBeenUpdated {
+        if projectHasBeenUpdated {
+            try projectService.update(project)
+        }
+        else {
             print("🤷‍♂️ Nothing to update.")
         }
     }

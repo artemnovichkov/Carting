@@ -7,7 +7,7 @@ import Foundation
 final class ScriptBody: BaseScriptBody {
     
     var inputPaths: String
-    let name: String
+    let name: String?
     var outputPaths: String
     var shellPath: String
     var shellScript: String
@@ -22,7 +22,9 @@ final class ScriptBody: BaseScriptBody {
         }
         components.append(.tripleTab + ");")
         components.append(.tripleTab + "inputPaths = \(inputPaths);")
-        components.append(.tripleTab + "name = \(name);")
+        if let name = name {
+            components.append(.tripleTab + "name = \(name);")
+        }
         components.append(.tripleTab + "outputPaths = \(outputPaths);")
         components.append(.tripleTab + "runOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);")
         components.append(.tripleTab + "shellPath = \(shellPath);")
@@ -40,7 +42,7 @@ final class ScriptBody: BaseScriptBody {
          buildActionMask: String = "2147483647",
          files: [File] = [],
          inputPaths: String = "(\n\t\t\t)",
-         name: String,
+         name: String?,
          outputPaths: String = "(\n\t\t\t)",
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
