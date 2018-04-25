@@ -43,6 +43,8 @@ Usage: carting [command] [options]
       Adds a new script with input/output file paths or updates the script named `Carthage`.
   -s, --script:
       Updates input/output file paths for the script with passed name.
+  -p, --path:
+      The project directory path.
   list:
       Prints Carthage frameworks list with linking description.
   help:

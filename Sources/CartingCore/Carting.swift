@@ -13,7 +13,7 @@ public final class Carting {
     private let arguments: [String]
 
     private let projectService = ProjectService()
-    private let frameworkInformationService = FrameworkInformationService()
+    private lazy var frameworkInformationService = FrameworkInformationService()
 
     public init(arguments: [String] = CommandLine.arguments) {
         self.arguments = arguments
@@ -26,18 +26,19 @@ public final class Carting {
             return
         }
 
+        frameworkInformationService.path = arguments.path
         switch arguments.command {
         case .help:
             print(Arguments.description)
         case let .script(name: name):
-            try updateScript(withName: name)
+            try updateScript(withName: name, path: arguments.path)
         case .list:
             frameworkInformationService.printFrameworksInformation()
         }
     }
 
-    private func updateScript(withName scriptName: String) throws {
-        let project = try projectService.project()
+    private func updateScript(withName scriptName: String, path: String?) throws {
+        let project = try projectService.project(path)
 
         var projectHasBeenUpdated = false
 
