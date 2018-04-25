@@ -8,8 +8,19 @@ import Foundation
 
 class FrameworkInformationService {
 
+    var path: String?
+
+    private var projectFolder: Folder {
+        if let path = path, let folder = try? Folder(path: path) {
+            return folder
+        }
+        return FileSystem().currentFolder
+    }
+
+    // MARK: - Lifecycle
+
     func frameworksInformation() throws -> [FrameworkInformation] {
-        let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS")
+        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
         let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
         return try frameworks.map(information)
     }
@@ -40,7 +51,7 @@ class FrameworkInformationService {
     }
 
     private func convertFrameworkToStatic(withName name: String) throws {
-        let frameworkFolder = try FileSystem().currentFolder.subfolder(atPath: "Carthage/Build/iOS/\(name).framework")
+        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS/\(name).framework")
         let configPath = "/tmp/static.xcconfig"
         let configFile = try FileSystem().createFile(at: configPath)
         let content = "MACH_O_TYPE = staticlib"
@@ -90,5 +101,5 @@ func linking(fromOutput output: String) -> FrameworkInformation.Linking {
 }
 
 func architectures(fromOutput output: String) -> [FrameworkInformation.Architecture] {
-    return output.components(separatedBy: " ").flatMap { FrameworkInformation.Architecture(rawValue: $0) }
+    return output.components(separatedBy: " ").compactMap { FrameworkInformation.Architecture(rawValue: $0) }
 }
