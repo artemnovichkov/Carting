@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-	<a href="https://travis-ci.org/artemnovichkov/swift-project-template">
-        <img src="https://travis-ci.org/artemnovichkov/swift-project-template.svg?branch=master" />
+	<a href="https://travis-ci.org/artemnovichkov/Carting">
+        <img src="https://travis-ci.org/artemnovichkov/Carting.svg?branch=master" />
     <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
