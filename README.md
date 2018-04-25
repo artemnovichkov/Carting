@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-	<a href="https://travis-ci.org/artemnovichkov/swift-project-template">
-        <img src="https://travis-ci.org/artemnovichkov/swift-project-template.svg?branch=master" />
+	<a href="https://travis-ci.org/artemnovichkov/Carting">
+        <img src="https://travis-ci.org/artemnovichkov/Carting.svg?branch=master" />
     <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
@@ -43,6 +43,8 @@ Usage: carting [command] [options]
       Adds a new script with input/output file paths or updates the script named `Carthage`.
   -s, --script:
       Updates input/output file paths for the script with passed name.
+  -p, --path:
+      The project directory path.
   list:
       Prints Carthage frameworks list with linking description.
   help:

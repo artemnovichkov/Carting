@@ -15,6 +15,7 @@ struct Arguments {
     }
 
     var command: Command = .help
+    var path: String?
 
     init?(arguments: [String]) {
         for (index, argument) in arguments.enumerated() {
@@ -25,6 +26,10 @@ struct Arguments {
                 let nameIndex = index + 1
                 let name = arguments.count > nameIndex ? arguments[nameIndex] : Keys.defaultScriptName
                 command = .script(name: name)
+            case "-p", "--path":
+                let pathIndex = index + 1
+                let path = arguments.count > pathIndex ? arguments[pathIndex] : nil
+                self.path = path
             case "list":
                 command = .list
             case "help":
@@ -40,7 +45,9 @@ Usage: carting [command] [options]
   update:
       Adds a new script with input/output file paths or updates the script named `Carthage`.
   -s, --script:
-      Updates input/output file paths for the script with passed name.
+      The name of Carthage script.
+  -p, --path:
+      The project directory path.
   list:
       Prints Carthage frameworks list with linking description.
   help:

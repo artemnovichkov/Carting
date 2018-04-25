@@ -42,19 +42,20 @@ final class ProjectService {
         self.shellScriptsService = shellScriptsService
         self.frameworksService = frameworksService
     }
-    
+
+    /// - Parameter path: The project directory path.
     /// - Returns: a Project instance from current directory.
     /// - Throws: an error if there is no any projects.
-    func project() throws -> Project {
-        let path = fileManager.currentDirectoryPath
+    func project(_ path: String? = nil) throws -> Project {
+        let projectDirectoryPath = path ?? fileManager.currentDirectoryPath
         do {
-            let fileNames = try fileManager.contentsOfDirectory(atPath: path)
+            let fileNames = try fileManager.contentsOfDirectory(atPath: projectDirectoryPath)
             let fileName = fileNames.first { $0.hasSuffix(Keys.projectExtension) }
             guard let projectFileName = fileName else {
                 throw Error.projectFileReadingFailed
             }
-            let path = fileManager.currentDirectoryPath + "/\(projectFileName)" + Keys.projectPath
-            guard let data = fileManager.contents(atPath: path),
+            let projectFilePath = projectDirectoryPath + "/\(projectFileName)" + Keys.projectPath
+            guard let data = fileManager.contents(atPath: projectFilePath),
                 let body = String(data: data, encoding: .utf8) else {
                     throw Error.projectReadingFailed
             }
@@ -62,7 +63,8 @@ final class ProjectService {
             let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
             let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
             
-            return Project(name: projectFileName,
+            return Project(path: projectDirectoryPath,
+                           name: projectFileName,
                            body: body,
                            targetsRange: targetsRange,
                            targets: targets,
@@ -71,7 +73,7 @@ final class ProjectService {
                            frameworkScripts: frameworkScripts)
         }
         catch {
-            throw Error.contentsOfDirectoryReadingFailed(path: path)
+            throw Error.contentsOfDirectoryReadingFailed(path: projectDirectoryPath)
         }
     }
     
@@ -89,7 +91,7 @@ final class ProjectService {
             let scriptsString = shellScriptsService.string(from: project.scripts,
                                                            needSectionBlock: true)
             body.insert(contentsOf: "\n\n\(scriptsString)",
-                        at: range.upperBound)
+                at: range.upperBound)
             newScriptsProjectString = body
         }
         else {
@@ -98,7 +100,7 @@ final class ProjectService {
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
         
-        let path = fileManager.currentDirectoryPath + "/\(project.name)" + Keys.projectPath
+        let path = project.path + "/\(project.name)" + Keys.projectPath
         do {
             try newTargetsProjectString.write(toFile: path,
                                               atomically: true,
@@ -127,11 +129,12 @@ final class ProjectService {
             return decription(forPaths: outputPaths)
         }
     }
-    
+
+    /// - Parameter path: The project directory path.
     /// - Returns: an array of iOS frameworks names built by Carthage.
     /// - Throws: ar error if there is no Carthage folder.
-    func frameworkNames() throws -> [String] {
-        let path = fileManager.currentDirectoryPath + Keys.carthagePath
+    func frameworkNames(_ path: String? = nil) throws -> [String] {
+        let path = path ?? fileManager.currentDirectoryPath + Keys.carthagePath
         do {
             let fileNames = try fileManager.contentsOfDirectory(atPath: path)
             return fileNames.lazy.filter { $0.hasSuffix(Keys.frameworkExtension) }
