@@ -24,4 +24,9 @@ extension String {
     static var tripleTab: String {
         return "\t\t\t"
     }
+
+    var quotify: String {
+        return "'\(self)'"
+    }
+
 }
