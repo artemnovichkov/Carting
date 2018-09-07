@@ -28,5 +28,4 @@ extension String {
     var quotify: String {
         return "'\(self)'"
     }
-
 }

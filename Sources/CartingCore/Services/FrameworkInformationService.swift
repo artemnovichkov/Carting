@@ -45,10 +45,13 @@ final class FrameworkInformationService {
             let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
             let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
-            let inputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
-                                                              type: .input)
-            let outputPathsString = projectService.pathsString(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
-                                                               type: .output)
+            let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                  type: .input)
+            let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                   type: .output)
+
+            let inputPathsString = projectService.decription(forPaths: inputPaths)
+            let outputPathsString = projectService.decription(forPaths: outputPaths)
 
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
@@ -69,7 +72,7 @@ final class FrameworkInformationService {
                     print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
                 }
             }
-            else if linkedCarthageDynamicFrameworkNames.count > 0 {
+            else if linkedCarthageDynamicFrameworkNames.isEmpty {
                 let body = ScriptBody(inputPaths: inputPathsString,
                                       name: scriptName,
                                       outputPaths: outputPathsString,
@@ -99,23 +102,33 @@ final class FrameworkInformationService {
         return try frameworks.map(information)
     }
 
-    func printFrameworksInformation() {
-        do {
-            let informations = try frameworksInformation()
-            informations.forEach { information in
-                let description = [information.name, information.linking.rawValue].joined(separator: "\t\t") +
-                    "\t" +
-                    information.architectures.map { $0.rawValue }.joined(separator: ", ")
-                print(description)
-            }
-        }
-        catch {
-            print(error)
+    func printFrameworksInformation() throws {
+        let informations = try frameworksInformation()
+        informations.forEach { information in
+            let description = [information.name, information.linking.rawValue].joined(separator: "\t\t") +
+                "\t" +
+                information.architectures.map { $0.rawValue }.joined(separator: ", ")
+            print(description)
         }
     }
 
-    func printFrameworksWarnings() {
+    func printFrameworksWarnings(path: String?) throws {
+        let project = try projectService.project(path)
 
+        var projectHasBeenUpdated = false
+
+        try project.targets.forEach { target in
+            let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
+            let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
+            guard let script = frameworkScript else {
+                return
+            }
+            let linkedCarthageFrameworkNames = try frameworksInformation()
+                .filter { information in
+                    script.body.files.contains { $0.name == information.name }
+                }
+                .map { $0.name }
+        }
     }
 
     // MARK: - Private
@@ -138,16 +151,16 @@ final class FrameworkInformationService {
         try configFile.write(string: content)
         setenv("XCODE_XCCONFIG_FILE", configPath, 1)
 
-//        let output = try shellOut(to: "export", arguments: ["XCODE_XCCONFIG_FILE=\"\(configPath)\""])
-//        print(output)
+        //        let output = try shellOut(to: "export", arguments: ["XCODE_XCCONFIG_FILE=\"\(configPath)\""])
+        //        print(output)
         try shellOut(to: "/usr/local/bin/carthage build", arguments: [frameworkFolder.nameExcludingExtension])
 
-//        let process = Process()
-//        process.environment = ["XCODE_XCCONFIG_FILE": configPath]
-//        process.launchPath = "/bin/bash"
-//        process.arguments = ["-c", "usr/local/bin/carthage build", frameworkFolder.nameExcludingExtension]
-//        process.launch()
-//        process.waitUntilExit()
+        //        let process = Process()
+        //        process.environment = ["XCODE_XCCONFIG_FILE": configPath]
+        //        process.launchPath = "/bin/bash"
+        //        process.arguments = ["-c", "usr/local/bin/carthage build", frameworkFolder.nameExcludingExtension]
+        //        process.launch()
+        //        process.waitUntilExit()
 
         print("Done!")
     }

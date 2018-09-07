@@ -90,8 +90,7 @@ final class ProjectService {
             var body = project.body
             let scriptsString = shellScriptsService.string(from: project.scripts,
                                                            needSectionBlock: true)
-            body.insert(contentsOf: "\n\n\(scriptsString)",
-                at: range.upperBound)
+            body.insert(contentsOf: "\n\n\(scriptsString)", at: range.upperBound)
             newScriptsProjectString = body
         }
         else {
@@ -114,19 +113,17 @@ final class ProjectService {
     /// - Parameters:
     ///   - names: names of frameworks with .framework extension, for example, "Alamofire.framework".
     ///   - type: type of path.
-    /// - Returns: formatted string uncluded all paths.
-    func pathsString(forFrameworkNames names: [String], type: PathType) -> String {
+    /// - Returns: All paths of passed type.
+    func paths(forFrameworkNames names: [String], type: PathType) -> [String] {
+        let prefix: String
         switch type {
         case .input:
-            let inputPaths = names.map { frameworkName in
-                return Keys.inputPath + frameworkName
-            }
-            return decription(forPaths: inputPaths)
+            prefix = Keys.inputPath
         case .output:
-            let outputPaths = names.map { frameworkName in
-                return Keys.outputPath + frameworkName
-            }
-            return decription(forPaths: outputPaths)
+            prefix = Keys.outputPath
+        }
+        return names.map { frameworkName in
+            return prefix + frameworkName
         }
     }
 
@@ -144,7 +141,11 @@ final class ProjectService {
         }
     }
     
-    private func decription(forPaths paths: [String]) -> String {
+    /// Formatted description for passed paths.
+    ///
+    /// - Parameter paths: Paths for frameworks.
+    /// - Returns: formatted string uncluded all paths.
+    func decription(forPaths paths: [String]) -> String {
         var string = "(\n"
         paths.forEach { path in
             string += .tripleTab + "\t\"\(path)\",\n"
