@@ -39,9 +39,9 @@ enum MainError: Swift.Error {
     case noScript(name: String)
 }
 
-extension MainError: LocalizedError {
+extension MainError: CustomStringConvertible {
 
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .noScript(name: let name): return "Can't find script with name \(name)"
         }

@@ -154,9 +154,9 @@ final class ProjectService {
     }
 }
 
-extension ProjectService.Error: LocalizedError {
+extension ProjectService.Error: CustomStringConvertible {
     
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .contentsOfDirectoryReadingFailed(let path): return "Can't get content of directory at path \(path)."
         case .projectFileReadingFailed: return "Can't find project file."

@@ -133,9 +133,9 @@ final class TargetsService {
     }
 }
 
-extension TargetsService.Error: LocalizedError {
+extension TargetsService.Error: CustomStringConvertible {
     
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .targetsReadingFailed: return "Can't find target section in project."
         }

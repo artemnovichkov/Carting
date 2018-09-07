@@ -91,9 +91,9 @@ final class FrameworksService {
     }
 }
 
-extension FrameworksService.Error: LocalizedError {
+extension FrameworksService.Error: CustomStringConvertible {
     
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .frameworksReadingFailed: return "Can't find frameworks section in project."
         }
