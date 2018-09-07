@@ -7,7 +7,7 @@ import Foundation
 struct Arguments {
 
     enum Command {
-        case script(name: String), list, help
+        case script(name: String), list, lint, help
     }
 
     private enum Keys {
@@ -32,6 +32,8 @@ struct Arguments {
                 self.path = path
             case "list":
                 command = .list
+            case "lint":
+                command = .lint
             case "help":
                 command = .help
             default: break
@@ -50,6 +52,8 @@ Usage: carting [command] [options]
       The project directory path.
   list:
       Prints Carthage frameworks list with linking description.
+  lint:
+      Prints warnings wot imported frameworks with missing input/output file paths.
   help:
       Prints this message.
 """
