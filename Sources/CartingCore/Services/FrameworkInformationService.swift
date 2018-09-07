@@ -122,8 +122,8 @@ final class FrameworkInformationService {
 
     private func information(for framework: Folder) throws -> FrameworkInformation {
         let path = framework.path + framework.nameExcludingExtension
-        let fileOutput = try shellOut(to: "file", arguments: [path])
-        let lipoOutput = try shellOut(to: "lipo", arguments: ["-info", path])
+        let fileOutput = try shellOut(to: "file", arguments: [path.quotify])
+        let lipoOutput = try shellOut(to: "lipo", arguments: ["-info", path.quotify])
         let rawArchitectures = lipoOutput.components(separatedBy: ": ").last!
         return FrameworkInformation(name: framework.name,
                                     architectures: architectures(fromOutput: rawArchitectures),
