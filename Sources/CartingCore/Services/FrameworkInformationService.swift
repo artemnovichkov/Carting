@@ -42,22 +42,39 @@ final class FrameworkInformationService {
                 }
                 .map { $0.name }
 
-            let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
-            let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
-
             let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                   type: .input)
             let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                    type: .output)
 
+            let inputFileList = try projectFolder.createFileIfNeeded(withName: "\(target.name)-inputs.xcfilelist")
+            try inputFileList.write(string: inputPaths.joined(separator: "\n"))
+            let inputFileListPath = "$(SRCROOT)/" + inputFileList.name
+
+            let outputFileList = try projectFolder.createFileIfNeeded(withName: "\(target.name)-outputs.xcfilelist")
+            try outputFileList.write(string: outputPaths.joined(separator: "\n"))
+            let outputFileListPath = "$(SRCROOT)/" + outputFileList.name
+
+            let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
+            let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
+
+
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
-                if carthage.body.inputPaths != inputPaths {
-                    carthage.body.inputPaths = inputPaths
+                if !carthage.body.inputPaths.isEmpty {
+                    carthage.body.inputPaths.removeAll()
                     scriptHasBeenUpdated = true
                 }
-                if carthage.body.outputPaths != outputPaths {
-                    carthage.body.outputPaths = outputPaths
+                if carthage.body.inputFileListPaths.first != inputFileListPath {
+                    carthage.body.inputFileListPaths = [inputFileListPath]
+                    scriptHasBeenUpdated = true
+                }
+                if carthage.body.outputFileListPaths.first != outputFileListPath {
+                    carthage.body.outputFileListPaths = [outputFileListPath]
+                    scriptHasBeenUpdated = true
+                }
+                if !carthage.body.outputPaths.isEmpty {
+                    carthage.body.outputPaths.removeAll()
                     scriptHasBeenUpdated = true
                 }
                 if carthage.body.shellScript != Keys.carthageScript {
