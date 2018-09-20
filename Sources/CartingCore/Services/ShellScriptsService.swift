@@ -91,8 +91,8 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
-            let inputPaths = body["inputPaths"],
-            let outputPaths = body["outputPaths"],
+            let rawInputPaths = body["inputPaths"],
+            let rawOutputPaths = body["outputPaths"],
             let runOnlyForDeploymentPostprocessing = body["runOnlyForDeploymentPostprocessing"],
             let shellPath = body["shellPath"],
             let shellScript = body["shellScript"]
@@ -102,6 +102,14 @@ final class ShellScriptsService {
         var files = [File]()
         if let filesString = body["files"] {
             files = FilesService.scanFiles(fromString: filesString)
+        }
+        let inputPaths = rawInputPaths.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
+            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
+            return newPath.isEmpty ? nil : newPath
+        }
+        let outputPaths = rawOutputPaths.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
+            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
+            return newPath.isEmpty ? nil : newPath
         }
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
@@ -122,5 +130,22 @@ extension ShellScriptsService.Error: CustomStringConvertible {
         switch self {
         case .scriptsReadingFailed: return "Can't find script section in project."
         }
+    }
+}
+
+extension String {
+
+    func deleting(prefix: String) -> String {
+        guard hasPrefix(prefix) else {
+            return self
+        }
+        return String(dropFirst(prefix.count))
+    }
+
+    func deleting(suffix: String) -> String {
+        guard hasSuffix(suffix) else {
+            return self
+        }
+        return String(dropLast(suffix.count))
     }
 }

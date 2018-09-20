@@ -50,17 +50,14 @@ final class FrameworkInformationService {
             let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                    type: .output)
 
-            let inputPathsString = projectService.description(forPaths: inputPaths)
-            let outputPathsString = projectService.description(forPaths: outputPaths)
-
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
-                if carthage.body.inputPaths != inputPathsString {
-                    carthage.body.inputPaths = inputPathsString
+                if carthage.body.inputPaths != inputPaths {
+                    carthage.body.inputPaths = inputPaths
                     scriptHasBeenUpdated = true
                 }
-                if carthage.body.outputPaths != outputPathsString {
-                    carthage.body.outputPaths = outputPathsString
+                if carthage.body.outputPaths != outputPaths {
+                    carthage.body.outputPaths = outputPaths
                     scriptHasBeenUpdated = true
                 }
                 if carthage.body.shellScript != Keys.carthageScript {
@@ -73,9 +70,9 @@ final class FrameworkInformationService {
                 }
             }
             else if linkedCarthageDynamicFrameworkNames.isEmpty {
-                let body = ScriptBody(inputPaths: inputPathsString,
+                let body = ScriptBody(inputPaths: inputPaths,
                                       name: scriptName,
-                                      outputPaths: outputPathsString,
+                                      outputPaths: outputPaths,
                                       shellScript: Keys.carthageScript)
 
                 let identifier = String.randomAlphaNumericString(length: 24)
