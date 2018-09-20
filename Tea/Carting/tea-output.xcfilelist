@@ -1,0 +1,3 @@
+# tea-output.xcfilelist
+
+$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/Framezilla.framework
