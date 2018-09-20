@@ -47,17 +47,21 @@ final class FrameworkInformationService {
             let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                    type: .output)
 
-            let inputFileList = try projectFolder.createFileIfNeeded(withName: "\(target.name)-inputs.xcfilelist")
-            try inputFileList.write(string: inputPaths.joined(separator: "\n"))
-            let inputFileListPath = "$(SRCROOT)/" + inputFileList.name
+            let carthageFolder = try projectFolder.subfolder(named: "Carthage")
+            let listFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+            let parent = carthageFolder.parent ?? projectFolder
+            let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/")
 
-            let outputFileList = try projectFolder.createFileIfNeeded(withName: "\(target.name)-outputs.xcfilelist")
+            let inputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-inputPaths.xcfilelist")
+            try inputFileList.write(string: inputPaths.joined(separator: "\n"))
+            let inputFileListPath = [path, inputFileList.name].joined(separator: "/")
+
+            let outputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-outputPaths.xcfilelist")
             try outputFileList.write(string: outputPaths.joined(separator: "\n"))
-            let outputFileListPath = "$(SRCROOT)/" + outputFileList.name
+            let outputFileListPath = [path, outputFileList.name].joined(separator: "/")
 
             let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
             let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
-
 
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
@@ -65,11 +69,11 @@ final class FrameworkInformationService {
                     carthage.body.inputPaths.removeAll()
                     scriptHasBeenUpdated = true
                 }
-                if carthage.body.inputFileListPaths.first != inputFileListPath {
+                if carthage.body.inputFileListPaths.count > 1 || carthage.body.inputFileListPaths.first != inputFileListPath {
                     carthage.body.inputFileListPaths = [inputFileListPath]
                     scriptHasBeenUpdated = true
                 }
-                if carthage.body.outputFileListPaths.first != outputFileListPath {
+                if carthage.body.outputFileListPaths.count > 1 || carthage.body.outputFileListPaths.first != outputFileListPath {
                     carthage.body.outputFileListPaths = [outputFileListPath]
                     scriptHasBeenUpdated = true
                 }
@@ -86,10 +90,10 @@ final class FrameworkInformationService {
                     print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
                 }
             }
-            else if linkedCarthageDynamicFrameworkNames.isEmpty {
-                let body = ScriptBody(inputPaths: inputPaths,
+            else {
+                let body = ScriptBody(inputFileListPaths: [inputFileListPath],
                                       name: scriptName,
-                                      outputPaths: outputPaths,
+                                      outputFileListPaths: [outputFileListPath],
                                       shellScript: Keys.carthageScript)
 
                 let identifier = String.randomAlphaNumericString(length: 24)
