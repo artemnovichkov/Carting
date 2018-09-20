@@ -116,9 +116,9 @@ final class ShellScriptsService {
     }
 }
 
-extension ShellScriptsService.Error: LocalizedError {
+extension ShellScriptsService.Error: CustomStringConvertible {
     
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .scriptsReadingFailed: return "Can't find script section in project."
         }

@@ -11,6 +11,6 @@ do {
     try carting.run()
 }
 catch {
-    print("❌ \(error.localizedDescription)")
+    print("❌ \(error)")
 }
 
