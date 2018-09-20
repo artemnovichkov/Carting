@@ -91,7 +91,9 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
+            let rawInputFileListPaths = body["inputFileListPaths"],
             let rawInputPaths = body["inputPaths"],
+            let rawOutputFileListPaths = body["outputFileListPaths"],
             let rawOutputPaths = body["outputPaths"],
             let runOnlyForDeploymentPostprocessing = body["runOnlyForDeploymentPostprocessing"],
             let shellPath = body["shellPath"],
@@ -103,24 +105,25 @@ final class ShellScriptsService {
         if let filesString = body["files"] {
             files = FilesService.scanFiles(fromString: filesString)
         }
-        let inputPaths = rawInputPaths.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
-            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
-            return newPath.isEmpty ? nil : newPath
-        }
-        let outputPaths = rawOutputPaths.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
-            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
-            return newPath.isEmpty ? nil : newPath
-        }
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
                           files: files,
-                          inputPaths: inputPaths,
+                          inputFileListPaths: paths(from: rawInputFileListPaths),
+                          inputPaths: paths(from: rawInputPaths),
                           name: body["name"],
-                          outputPaths: outputPaths,
+                          outputFileListPaths: paths(from: rawOutputFileListPaths),
+                          outputPaths: paths(from: rawOutputPaths),
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
                           shellScript: shellScript,
                           showEnvVarsInLog: body["showEnvVarsInLog"])
+    }
+
+    private func paths(from string: String) -> [String] {
+        return  string.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
+            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
+            return newPath.isEmpty ? nil : newPath
+        }
     }
 }
 

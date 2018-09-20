@@ -5,9 +5,11 @@
 import Foundation
 
 final class ScriptBody: BaseScriptBody {
-    
+
+    var inputFileListPaths: [String]
     var inputPaths: [String]
     let name: String?
+    var outputFileListPaths: [String]
     var outputPaths: [String]
     var shellPath: String
     var shellScript: String
@@ -21,17 +23,25 @@ final class ScriptBody: BaseScriptBody {
             components.append(String.tripleTab + "\t\(file.identifier) /* \(file.name) in \(file.folder) */,")
         }
         components.append(.tripleTab + ");")
-        let rawInputPaths = inputPaths.reduce("") { result, path in
-            result + "\t\t\t\t\"" + path + "\","
+        let rawInputFileListPaths = inputFileListPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
         }
-        components.append(.tripleTab + "inputPaths = (\(rawInputPaths));")
+        components.append(.tripleTab + "inputFileListPaths = (\n\(rawInputFileListPaths)\t\t\t);")
+        let rawInputPaths = inputPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "inputPaths = (\n\(rawInputPaths)\t\t\t);")
         if let name = name {
             components.append(.tripleTab + "name = \(name);")
         }
-        let rawOutputPaths = outputPaths.reduce("") { result, path in
-            result + "\t\t\t\t\"" + path + "\","
+        let rawOutputFileListPaths = outputFileListPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
         }
-        components.append(.tripleTab + "outputPaths = (\(rawOutputPaths));")
+        components.append(.tripleTab + "outputFileListPaths = (\n\(rawOutputFileListPaths)\t\t\t);")
+        let rawOutputPaths = outputPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "outputPaths = (\n\(rawOutputPaths)\t\t\t);")
         components.append(.tripleTab + "runOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);")
         components.append(.tripleTab + "shellPath = \(shellPath);")
         if let showEnvVarsInLog = showEnvVarsInLog {
@@ -47,15 +57,19 @@ final class ScriptBody: BaseScriptBody {
     init(isa: String = "PBXShellScriptBuildPhase",
          buildActionMask: String = "2147483647",
          files: [File] = [],
+         inputFileListPaths: [String] = [],
          inputPaths: [String] = [],
          name: String?,
+         outputFileListPaths: [String] = [],
          outputPaths: [String] = [],
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
          shellScript: String = "\"\"",
          showEnvVarsInLog: String? = "0") {
+        self.inputFileListPaths = inputFileListPaths
         self.inputPaths = inputPaths
         self.name = name
+        self.outputFileListPaths = outputFileListPaths
         self.outputPaths = outputPaths
         self.shellPath = shellPath
         self.shellScript = shellScript
