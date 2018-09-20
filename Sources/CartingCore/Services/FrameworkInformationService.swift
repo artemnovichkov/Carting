@@ -50,7 +50,7 @@ final class FrameworkInformationService {
             let carthageFolder = try projectFolder.subfolder(named: "Carthage")
             let listFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
             let parent = carthageFolder.parent ?? projectFolder
-            let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/")
+            let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
             let inputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-inputPaths.xcfilelist")
             try inputFileList.write(string: inputPaths.joined(separator: "\n"))
@@ -87,7 +87,7 @@ final class FrameworkInformationService {
                 }
                 if scriptHasBeenUpdated {
                     projectHasBeenUpdated = true
-                    print("✅ Script \"\(scriptName)\" in target \"\(target.name)\" was successfully updated.")
+                    print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
                 }
             }
             else {
