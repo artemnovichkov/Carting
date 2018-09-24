@@ -59,6 +59,12 @@ Usage: carting [command] [options]
 $ brew install artemnovichkov/projects/carting
 ```
 
+### [Mint](https://github.com/yonaskolb/Mint):
+
+```bash
+$ mint run artemnovichkov/Carting
+```
+
 ### Make:
 
 ```bash

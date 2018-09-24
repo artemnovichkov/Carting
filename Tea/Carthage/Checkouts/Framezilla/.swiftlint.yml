@@ -1,0 +1,34 @@
+included:
+ - Sources
+
+disabled_rules:
+ - trailing_whitespace
+ - variable_name
+ - todo
+ - cyclomatic_complexity
+
+excluded:
+  - Carthage
+  - Pods
+
+force_try: warning
+force_cast: warning
+
+line_length: 200
+type_body_length:
+ - 300 # warning
+ - 400 # error
+
+file_length:
+  warning: 1000
+  error: 1200
+
+colon:
+  apply_to_dictionaries: true
+variable_name:
+  excluded:
+    - id
+statement_position:
+   statement_mode: uncuddled_else
+
+reporter: "xcode" # reporter type (xcode, json, csv, checkstyle)
