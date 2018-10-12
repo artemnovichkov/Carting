@@ -135,20 +135,3 @@ extension ShellScriptsService.Error: CustomStringConvertible {
         }
     }
 }
-
-extension String {
-
-    func deleting(prefix: String) -> String {
-        guard hasPrefix(prefix) else {
-            return self
-        }
-        return String(dropFirst(prefix.count))
-    }
-
-    func deleting(suffix: String) -> String {
-        guard hasSuffix(suffix) else {
-            return self
-        }
-        return String(dropLast(suffix.count))
-    }
-}
