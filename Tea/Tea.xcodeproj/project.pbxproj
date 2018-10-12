@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0644C9FA2170602D00CCE231 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0644C9F92170602C00CCE231 /* Alamofire.framework */; };
 		066CC0362152A41500CA87B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 066CC0352152A41500CA87B4 /* AppDelegate.swift */; };
 		066CC0382152A41500CA87B4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 066CC0372152A41500CA87B4 /* ViewController.swift */; };
 		066CC03B2152A41500CA87B4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 066CC0392152A41500CA87B4 /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0644C9F92170602C00CCE231 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = Carthage/Build/iOS/Alamofire.framework; sourceTree = "<group>"; };
 		066CC0322152A41500CA87B4 /* Tea.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tea.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		066CC0352152A41500CA87B4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		066CC0372152A41500CA87B4 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -31,6 +33,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0644C9FA2170602D00CCE231 /* Alamofire.framework in Frameworks */,
 				066CC0492152A4FA00CA87B4 /* Framezilla.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,6 +74,7 @@
 		066CC0472152A4F900CA87B4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0644C9F92170602C00CCE231 /* Alamofire.framework */,
 				066CC0482152A4FA00CA87B4 /* Framezilla.framework */,
 			);
 			name = Frameworks;
@@ -86,6 +90,7 @@
 				066CC02E2152A41500CA87B4 /* Sources */,
 				066CC02F2152A41500CA87B4 /* Frameworks */,
 				066CC0302152A41500CA87B4 /* Resources */,
+				T9WQG3LEMAB05UKZ6S02H1PP /* Carthage */,
 			);
 			buildRules = (
 			);
@@ -141,6 +146,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		T9WQG3LEMAB05UKZ6S02H1PP /* Carthage */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+				"$(SRCROOT)/Carthage/xcfilelists/Tea-inputPaths.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = Carthage;
+			outputFileListPaths = (
+				"$(SRCROOT)/Carthage/xcfilelists/Tea-outputPaths.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		066CC02E2152A41500CA87B4 /* Sources */ = {
