@@ -27,7 +27,7 @@ public final class Carting {
             print(Arguments.description)
         case let .script(name: name):
             try frameworkInformationService.updateScript(withName: name, path: arguments.path, format: arguments.format)
-        case .list:
+        case .info:
             try frameworkInformationService.printFrameworksInformation()
         }
     }

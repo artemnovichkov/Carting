@@ -7,7 +7,7 @@ import Foundation
 struct Arguments {
 
     enum Command {
-        case script(name: String), list, help
+        case script(name: String), info, help
     }
 
     enum Format: String {
@@ -40,8 +40,8 @@ struct Arguments {
                 if arguments.count > formatIndex, let format = Format(rawValue: arguments[formatIndex]) {
                     self.format = format
                 }
-            case "list":
-                command = .list
+            case "info":
+                command = .info
             case "help":
                 command = .help
             default: break
@@ -60,7 +60,7 @@ Usage: carting [command] [options]
       The project directory path.
   -f, --format:
       Format of input/output file paths - using simple paths or xcfilelists.
-  list:
+  info:
       Prints Carthage frameworks list with linking description.
   help:
       Prints this message.

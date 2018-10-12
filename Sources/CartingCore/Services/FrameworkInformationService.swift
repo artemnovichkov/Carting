@@ -65,25 +65,50 @@ final class FrameworkInformationService {
 
             if let carthage = carthageScript {
                 var scriptHasBeenUpdated = false
-                if !carthage.body.inputPaths.isEmpty {
-                    carthage.body.inputPaths.removeAll()
-                    scriptHasBeenUpdated = true
-                }
-                if carthage.body.inputFileListPaths.count > 1 || carthage.body.inputFileListPaths.first != inputFileListPath {
-                    carthage.body.inputFileListPaths = [inputFileListPath]
-                    scriptHasBeenUpdated = true
-                }
-                if carthage.body.outputFileListPaths.count > 1 || carthage.body.outputFileListPaths.first != outputFileListPath {
-                    carthage.body.outputFileListPaths = [outputFileListPath]
-                    scriptHasBeenUpdated = true
-                }
-                if !carthage.body.outputPaths.isEmpty {
-                    carthage.body.outputPaths.removeAll()
-                    scriptHasBeenUpdated = true
-                }
-                if carthage.body.shellScript != Keys.carthageScript {
-                    carthage.body.shellScript = Keys.carthageScript
-                    scriptHasBeenUpdated = true
+
+                switch format {
+                case .file:
+                    if !carthage.body.inputFileListPaths.isEmpty {
+                        carthage.body.inputFileListPaths.removeAll()
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.inputPaths != inputPaths {
+                        carthage.body.inputPaths = inputPaths
+                        scriptHasBeenUpdated = true
+                    }
+                    if !carthage.body.inputFileListPaths.isEmpty {
+                        carthage.body.inputFileListPaths.removeAll()
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.outputFileListPaths != outputPaths {
+                        carthage.body.outputFileListPaths = outputPaths
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.shellScript != Keys.carthageScript {
+                        carthage.body.shellScript = Keys.carthageScript
+                        scriptHasBeenUpdated = true
+                    }
+                case .list:
+                    if !carthage.body.inputPaths.isEmpty {
+                        carthage.body.inputPaths.removeAll()
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.inputFileListPaths.count > 1 || carthage.body.inputFileListPaths.first != inputFileListPath {
+                        carthage.body.inputFileListPaths = [inputFileListPath]
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.outputFileListPaths.count > 1 || carthage.body.outputFileListPaths.first != outputFileListPath {
+                        carthage.body.outputFileListPaths = [outputFileListPath]
+                        scriptHasBeenUpdated = true
+                    }
+                    if !carthage.body.outputPaths.isEmpty {
+                        carthage.body.outputPaths.removeAll()
+                        scriptHasBeenUpdated = true
+                    }
+                    if carthage.body.shellScript != Keys.carthageScript {
+                        carthage.body.shellScript = Keys.carthageScript
+                        scriptHasBeenUpdated = true
+                    }
                 }
                 if scriptHasBeenUpdated {
                     projectHasBeenUpdated = true

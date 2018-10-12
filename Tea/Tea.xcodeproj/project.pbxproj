@@ -90,7 +90,7 @@
 				066CC02E2152A41500CA87B4 /* Sources */,
 				066CC02F2152A41500CA87B4 /* Frameworks */,
 				066CC0302152A41500CA87B4 /* Resources */,
-				T9WQG3LEMAB05UKZ6S02H1PP /* Carthage */,
+				9KU9ZE4FVAQAOS5RW0B4A6J2 /* Carthage */,
 			);
 			buildRules = (
 			);
@@ -148,9 +148,9 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		T9WQG3LEMAB05UKZ6S02H1PP /* Carthage */ = {
+		9KU9ZE4FVAQAOS5RW0B4A6J2 /* Carthage */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
@@ -167,6 +167,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
