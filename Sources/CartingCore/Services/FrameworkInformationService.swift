@@ -25,7 +25,7 @@ final class FrameworkInformationService {
 
     // MARK: - Lifecycle
 
-    func updateScript(withName scriptName: String, path: String?) throws {
+    func updateScript(withName scriptName: String, path: String?, format: Arguments.Format) throws {
         let project = try projectService.project(path)
 
         var projectHasBeenUpdated = false
@@ -91,10 +91,19 @@ final class FrameworkInformationService {
                 }
             }
             else {
-                let body = ScriptBody(inputFileListPaths: [inputFileListPath],
+                let body: ScriptBody
+                switch format {
+                case .file:
+                    body = ScriptBody(inputPaths: inputPaths,
+                                      name: scriptName,
+                                      outputPaths: outputPaths,
+                                      shellScript: Keys.carthageScript)
+                case .list:
+                    body = ScriptBody(inputFileListPaths: [inputFileListPath],
                                       name: scriptName,
                                       outputFileListPaths: [outputFileListPath],
                                       shellScript: Keys.carthageScript)
+                }
 
                 let identifier = String.randomAlphaNumericString(length: 24)
                 let script = Script(identifier: identifier, name: scriptName, body: body)
