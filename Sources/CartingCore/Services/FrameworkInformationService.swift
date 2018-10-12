@@ -8,7 +8,7 @@ import Foundation
 
 final class FrameworkInformationService {
 
-    enum Keys {
+    private enum Keys {
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
 
