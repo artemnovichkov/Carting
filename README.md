@@ -1,6 +1,7 @@
 <p align="center">
-<img src=".github/Logo.png" width="480" max-width="90%" alt="Carting" />
+  <img src=".github/Logo.png" width="480" max-width="90%" alt="Carting" />
 </p>
+
 
 <p align="center">
 	<a href="https://travis-ci.org/artemnovichkov/Carting">
@@ -17,8 +18,9 @@
 Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting does it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
 
 <p align="center">
-<img src=".github/carting.png" max-width="90%" alt="Carting usage" />
+  <img src=".github/carting.png" max-width="90%" alt="Carting usage" />
 </p>
+
 
 ## Using
 
@@ -35,7 +37,10 @@ If there is no script with the name, Carting will add a new one.
 Since Xcode 10 Run Script build phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-seperated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
 
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
-<img src="error.png" alt="Project parsing error" />
+
+<p align="center">
+  <img src=".github/error.png" max-width="90%" alt="Project parsing error" />
+</p>
 
 Run `carting help` to see available commands:
 
