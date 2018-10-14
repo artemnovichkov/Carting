@@ -1,0 +1,65 @@
+# paths to ignore during linting. Takes precedence over `included`.
+
+excluded:
+  - Carthage/
+  - Pods/
+
+# Rules
+
+opt_in_rules:
+  - conditional_returns_on_newline
+  - fatal_error_message
+  - overridden_super_call
+  - closure_end_indentation
+  - closure_spacing
+  - empty_string
+  - explicit_init
+  - first_where
+  - joined_default_parameter
+  - multiline_parameters
+  - prohibited_super_call
+  - sorted_first_last
+  - untyped_error_in_catch
+
+force_cast: error
+force_try: error
+
+colon:
+  apply_to_dictionaries: false
+
+identifier_name:
+  excluded:
+    - id
+    - URL
+
+statement_position:
+   statement_mode: uncuddled_else
+
+# Constants
+
+file_length:
+  warning: 1000
+  error: 1500
+
+type_body_length:
+  warning: 800
+  error: 1000
+
+line_length: 140
+
+function_parameter_count: 4
+
+type_name:
+  min_length: 2 # only warning
+
+# Custom rules
+
+custom_rules:
+  enum_cases_on_newline:
+    name: "Enum cases on newline"
+    regex: "^\\s*case[\\h\\S]*,(?![^(]*\\))[^:|,]+$"
+    message: "Enum cases should always start with a newline."
+  accessors_and_observers_on_newline:
+    name: "Property accessors and observers on newline"
+    regex: "^\\s*(get|set|didSet|willSet)[\\h\\S]\\{[\\h\\S]+$"
+    message: "Property accessors and observers should always start with a newline."

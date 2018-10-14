@@ -77,7 +77,6 @@ final class ProjectService {
         }
     }
 
-
     /// - Parameter project: a project for updating.
     /// - Throws: throws if it can not white a project to project file.
     func update(_ project: Project) throws {
