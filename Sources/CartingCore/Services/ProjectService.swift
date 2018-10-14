@@ -5,7 +5,7 @@
 import Foundation
 
 final class ProjectService {
-    
+
     enum Error: Swift.Error {
         case contentsOfDirectoryReadingFailed(path: String)
         case projectFileReadingFailed
@@ -13,11 +13,11 @@ final class ProjectService {
         case projectResourcesReadingFailed
         case projectUpdatingFailed
     }
-    
+
     enum PathType {
         case input, output
     }
-    
+
     private enum Keys {
         static let projectPath = "/project.pbxproj"
         static let carthagePath = "/Carthage/Build/iOS"
@@ -27,12 +27,12 @@ final class ProjectService {
         static let frameworkExtension = "framework"
         static let resourcesBuildSectionEnd = "/* End PBXResourcesBuildPhase section */"
     }
-    
+
     let fileManager: FileManager
     let targetsService: TargetsService
     let shellScriptsService: ShellScriptsService
     let frameworksService: FrameworksService
-    
+
     init(fileManager: FileManager = FileManager.default,
          targetsService: TargetsService = TargetsService(),
          shellScriptsService: ShellScriptsService = ShellScriptsService(),
@@ -62,7 +62,7 @@ final class ProjectService {
             let (targetsRange, targets) = try targetsService.targets(fromProjectString: body)
             let (scriptsRange, scripts) = shellScriptsService.scripts(fromProjectString: body)
             let (_, frameworkScripts) = try frameworksService.scripts(fromProjectString: body)
-            
+
             return Project(path: projectDirectoryPath,
                            name: projectFileName,
                            body: body,
@@ -76,8 +76,7 @@ final class ProjectService {
             throw Error.contentsOfDirectoryReadingFailed(path: projectDirectoryPath)
         }
     }
-    
-    
+
     /// - Parameter project: a project for updating.
     /// - Throws: throws if it can not white a project to project file.
     func update(_ project: Project) throws {
@@ -90,8 +89,7 @@ final class ProjectService {
             var body = project.body
             let scriptsString = shellScriptsService.string(from: project.scripts,
                                                            needSectionBlock: true)
-            body.insert(contentsOf: "\n\n\(scriptsString)",
-                at: range.upperBound)
+            body.insert(contentsOf: "\n\n\(scriptsString)", at: range.upperBound)
             newScriptsProjectString = body
         }
         else {
@@ -99,7 +97,7 @@ final class ProjectService {
         }
         let newTargetsProjectString = newScriptsProjectString.replacingCharacters(in: project.targetsRange,
                                                                                   with: targetsService.string(from: project.targets))
-        
+
         let path = project.path + "/\(project.name)" + Keys.projectPath
         do {
             try newTargetsProjectString.write(toFile: path,
@@ -110,23 +108,21 @@ final class ProjectService {
             throw Error.projectUpdatingFailed
         }
     }
-    
+
     /// - Parameters:
     ///   - names: names of frameworks with .framework extension, for example, "Alamofire.framework".
     ///   - type: type of path.
-    /// - Returns: formatted string uncluded all paths.
-    func pathsString(forFrameworkNames names: [String], type: PathType) -> String {
+    /// - Returns: All paths of passed type.
+    func paths(forFrameworkNames names: [String], type: PathType) -> [String] {
+        let prefix: String
         switch type {
         case .input:
-            let inputPaths = names.map { frameworkName in
-                return Keys.inputPath + frameworkName
-            }
-            return decription(forPaths: inputPaths)
+            prefix = Keys.inputPath
         case .output:
-            let outputPaths = names.map { frameworkName in
-                return Keys.outputPath + frameworkName
-            }
-            return decription(forPaths: outputPaths)
+            prefix = Keys.outputPath
+        }
+        return names.map { frameworkName in
+            return prefix + frameworkName
         }
     }
 
@@ -143,8 +139,12 @@ final class ProjectService {
             throw Error.contentsOfDirectoryReadingFailed(path: path)
         }
     }
-    
-    private func decription(forPaths paths: [String]) -> String {
+
+    /// Formatted description for passed paths.
+    ///
+    /// - Parameter paths: Paths for frameworks.
+    /// - Returns: formatted string uncluded all paths.
+    func description(forPaths paths: [String]) -> String {
         var string = "(\n"
         paths.forEach { path in
             string += .tripleTab + "\t\"\(path)\",\n"
@@ -154,9 +154,9 @@ final class ProjectService {
     }
 }
 
-extension ProjectService.Error: LocalizedError {
-    
-    var errorDescription: String? {
+extension ProjectService.Error: CustomStringConvertible {
+
+    var description: String {
         switch self {
         case .contentsOfDirectoryReadingFailed(let path): return "Can't get content of directory at path \(path)."
         case .projectFileReadingFailed: return "Can't find project file."

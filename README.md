@@ -32,6 +32,8 @@ $ carting update -s MyBestScript
 
 If there is no script with the name, Carting will add a new one.
 
+Since Xcode 10 Run Script build phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-seperated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
+
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
 <img src="error.png" alt="Project parsing error" />
 
@@ -42,10 +44,12 @@ Usage: carting [command] [options]
   update:
       Adds a new script with input/output file paths or updates the script named `Carthage`.
   -s, --script:
-      Updates input/output file paths for the script with passed name.
+      The name of Carthage script.
   -p, --path:
       The project directory path.
-  list:
+  -f, --format:
+      Format of input/output file paths - using simple paths or xcfilelists.
+  info:
       Prints Carthage frameworks list with linking description.
   help:
       Prints this message.

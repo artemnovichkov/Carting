@@ -5,10 +5,12 @@
 import Foundation
 
 final class ScriptBody: BaseScriptBody {
-    
-    var inputPaths: String
+
+    var inputFileListPaths: [String]
+    var inputPaths: [String]
     let name: String?
-    var outputPaths: String
+    var outputFileListPaths: [String]
+    var outputPaths: [String]
     var shellPath: String
     var shellScript: String
     var showEnvVarsInLog: String?
@@ -21,11 +23,25 @@ final class ScriptBody: BaseScriptBody {
             components.append(String.tripleTab + "\t\(file.identifier) /* \(file.name) in \(file.folder) */,")
         }
         components.append(.tripleTab + ");")
-        components.append(.tripleTab + "inputPaths = \(inputPaths);")
+        let rawInputFileListPaths = inputFileListPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "inputFileListPaths = (\n\(rawInputFileListPaths)\t\t\t);")
+        let rawInputPaths = inputPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "inputPaths = (\n\(rawInputPaths)\t\t\t);")
         if let name = name {
             components.append(.tripleTab + "name = \(name);")
         }
-        components.append(.tripleTab + "outputPaths = \(outputPaths);")
+        let rawOutputFileListPaths = outputFileListPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "outputFileListPaths = (\n\(rawOutputFileListPaths)\t\t\t);")
+        let rawOutputPaths = outputPaths.reduce("") { result, path in
+            result + "\t\t\t\t\"" + path + "\",\n"
+        }
+        components.append(.tripleTab + "outputPaths = (\n\(rawOutputPaths)\t\t\t);")
         components.append(.tripleTab + "runOnlyForDeploymentPostprocessing = \(runOnlyForDeploymentPostprocessing);")
         components.append(.tripleTab + "shellPath = \(shellPath);")
         if let showEnvVarsInLog = showEnvVarsInLog {
@@ -41,15 +57,19 @@ final class ScriptBody: BaseScriptBody {
     init(isa: String = "PBXShellScriptBuildPhase",
          buildActionMask: String = "2147483647",
          files: [File] = [],
-         inputPaths: String = "(\n\t\t\t)",
+         inputFileListPaths: [String] = [],
+         inputPaths: [String] = [],
          name: String?,
-         outputPaths: String = "(\n\t\t\t)",
+         outputFileListPaths: [String] = [],
+         outputPaths: [String] = [],
          runOnlyForDeploymentPostprocessing: String = "0",
          shellPath: String = "/bin/sh",
          shellScript: String = "\"\"",
          showEnvVarsInLog: String? = "0") {
+        self.inputFileListPaths = inputFileListPaths
         self.inputPaths = inputPaths
         self.name = name
+        self.outputFileListPaths = outputFileListPaths
         self.outputPaths = outputPaths
         self.shellPath = shellPath
         self.shellScript = shellScript

@@ -7,7 +7,11 @@ import Foundation
 struct Arguments {
 
     enum Command {
-        case script(name: String), list, help
+        case script(name: String), info, help
+    }
+
+    enum Format: String {
+        case file, list
     }
 
     private enum Keys {
@@ -16,6 +20,7 @@ struct Arguments {
 
     var command: Command = .help
     var path: String?
+    var format: Format = .list
 
     init?(arguments: [String]) {
         for (index, argument) in arguments.enumerated() {
@@ -30,8 +35,13 @@ struct Arguments {
                 let pathIndex = index + 1
                 let path = arguments.count > pathIndex ? arguments[pathIndex] : nil
                 self.path = path
-            case "list":
-                command = .list
+            case "-f", "--format":
+                let formatIndex = index + 1
+                if arguments.count > formatIndex, let format = Format(rawValue: arguments[formatIndex]) {
+                    self.format = format
+                }
+            case "info":
+                command = .info
             case "help":
                 command = .help
             default: break
@@ -48,7 +58,9 @@ Usage: carting [command] [options]
       The name of Carthage script.
   -p, --path:
       The project directory path.
-  list:
+  -f, --format:
+      Format of input/output file paths - using simple paths or xcfilelists.
+  info:
       Prints Carthage frameworks list with linking description.
   help:
       Prints this message.

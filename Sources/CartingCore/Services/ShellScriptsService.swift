@@ -91,8 +91,10 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
-            let inputPaths = body["inputPaths"],
-            let outputPaths = body["outputPaths"],
+            let rawInputFileListPaths = body["inputFileListPaths"],
+            let rawInputPaths = body["inputPaths"],
+            let rawOutputFileListPaths = body["outputFileListPaths"],
+            let rawOutputPaths = body["outputPaths"],
             let runOnlyForDeploymentPostprocessing = body["runOnlyForDeploymentPostprocessing"],
             let shellPath = body["shellPath"],
             let shellScript = body["shellScript"]
@@ -106,19 +108,28 @@ final class ShellScriptsService {
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
                           files: files,
-                          inputPaths: inputPaths,
+                          inputFileListPaths: paths(from: rawInputFileListPaths),
+                          inputPaths: paths(from: rawInputPaths),
                           name: body["name"],
-                          outputPaths: outputPaths,
+                          outputFileListPaths: paths(from: rawOutputFileListPaths),
+                          outputPaths: paths(from: rawOutputPaths),
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
                           shellScript: shellScript,
                           showEnvVarsInLog: body["showEnvVarsInLog"])
     }
+
+    private func paths(from string: String) -> [String] {
+        return  string.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
+            let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
+            return newPath.isEmpty ? nil : newPath
+        }
+    }
 }
 
-extension ShellScriptsService.Error: LocalizedError {
+extension ShellScriptsService.Error: CustomStringConvertible {
     
-    var errorDescription: String? {
+    var description: String {
         switch self {
         case .scriptsReadingFailed: return "Can't find script section in project."
         }
