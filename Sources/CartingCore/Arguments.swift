@@ -59,7 +59,9 @@ Usage: carting [command] [options]
   -p, --path:
       The project directory path.
   -f, --format:
-      Format of input/output file paths - using simple paths or xcfilelists.
+      Format of input/output file paths:
+        file - using simple paths
+        list - using xcfilelists
   info:
       Prints Carthage frameworks list with linking description.
   help:
