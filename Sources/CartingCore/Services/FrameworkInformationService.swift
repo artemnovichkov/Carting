@@ -76,12 +76,12 @@ final class FrameworkInformationService {
                         carthage.body.inputPaths = inputPaths
                         scriptHasBeenUpdated = true
                     }
-                    if !carthage.body.inputFileListPaths.isEmpty {
-                        carthage.body.inputFileListPaths.removeAll()
+                    if !carthage.body.outputFileListPaths.isEmpty {
+                        carthage.body.outputFileListPaths.removeAll()
                         scriptHasBeenUpdated = true
                     }
-                    if carthage.body.outputFileListPaths != outputPaths {
-                        carthage.body.outputFileListPaths = outputPaths
+                    if carthage.body.outputPaths != outputPaths {
+                        carthage.body.outputPaths = outputPaths
                         scriptHasBeenUpdated = true
                     }
                     if carthage.body.shellScript != Keys.carthageScript {
