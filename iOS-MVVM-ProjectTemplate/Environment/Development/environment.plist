@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>string</key>
+	<string>test string</string>
+	<key>isBool</key>
+	<false/>
+	<key>isInt</key>
+	<integer>10</integer>
+	<key>double</key>
+	<real>0.1</real>
+	<key>apiURLString</key>
+	<string>https://jsonplaceholder.typicode.com</string>
+	<key>date</key>
+	<date>2017-10-11T19:25:31Z</date>
+	<key>data</key>
+	<data>EjRWeA==</data>
+</dict>
+</plist>
