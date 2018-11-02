@@ -91,10 +91,11 @@ final class TargetsService {
         let name = body["name"],
         let productName = body["productName"],
         let productReference = body["productReference"],
-        let productType = body["productType"]
+        let productTypeRaw = body["productType"]
             else {
                 return nil
         }
+        let productType = ProductType(productTypeRaw)
         let set = CharacterSet(charactersIn: "()")
         let rawBody = buildPhases.trimmingCharacters(in: set)
         let phases = scanBuildPhases(fromString: rawBody)
