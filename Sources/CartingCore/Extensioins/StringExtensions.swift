@@ -39,4 +39,13 @@ extension String {
         }
         return String(dropLast(suffix.count))
     }
+
+    #if swift(>=4.2)
+    #else
+    func randomElement() -> Character? {
+        let randomNumber = Int(arc4random_uniform(UInt32(count)))
+        let randomIndex = index(startIndex, offsetBy: randomNumber)
+        return self[randomIndex]
+    }
+    #endif
 }
