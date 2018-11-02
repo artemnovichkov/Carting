@@ -14,7 +14,7 @@ final class ScriptBody: BaseScriptBody {
     var shellPath: String
     var shellScript: String
     var showEnvVarsInLog: String?
-    
+
     var description: String {
         var components = [.tripleTab + "isa = \(isa);"]
         components.append(.tripleTab + "buildActionMask = \(buildActionMask);")
@@ -53,7 +53,7 @@ final class ScriptBody: BaseScriptBody {
         }
         return components.joined(separator: "\n")
     }
-    
+
     init(isa: String = "PBXShellScriptBuildPhase",
          buildActionMask: String = "2147483647",
          files: [File] = [],

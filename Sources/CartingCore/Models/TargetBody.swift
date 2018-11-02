@@ -5,7 +5,7 @@
 import Foundation
 
 final class TargetBody {
-    
+
     let isa: String
     var buildPhases: [BuildPhase]
     let buildConfigurationList: String
@@ -15,7 +15,7 @@ final class TargetBody {
     let productName: String
     let productReference: String
     let productType: String
-    
+
     var description: String {
         var components = [.tripleTab + "isa = \(isa);"]
         components.append(.tripleTab + "buildConfigurationList = \(buildConfigurationList);")
@@ -32,7 +32,7 @@ final class TargetBody {
         components.append(.tripleTab + "productType = \(productType);\n")
         return components.joined(separator: "\n")
     }
-    
+
     init(isa: String,
          buildPhases: [BuildPhase],
          buildConfigurationList: String,

@@ -26,18 +26,18 @@ final class ShellScriptsService {
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
-        
+
         var scripts = [Script]()
         while !scanner.isAtEnd {
             scanner.scanUpTo(" /*", into: &identifier)
             scanner.scanString("/*", into: nil)
             scanner.scanUpTo(" */", into: &name)
-            
+
             scanner.scanUpTo(" = {", into: nil)
             scanner.scanString("= {", into: nil)
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
-            
+
             if let name = name as String?,
                 let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
@@ -47,20 +47,20 @@ final class ShellScriptsService {
         }
         return (range, scripts)
     }
-    
+
     /// - Parameters:
     ///   - scripts: an array of scripts.
     ///   - needSectionBlock: if true, returns whole section block
     /// - Returns: formatted string with all scripts for insertion into project.
     func string(from scripts: [Script], needSectionBlock: Bool = false) -> String {
         let scriptStrings: [String] = scripts.map { $0.description }
-        var scriptString = scriptStrings.joined(separator: "") + "\n"
+        var scriptString = scriptStrings.joined() + "\n"
         if needSectionBlock {
             scriptString = Keys.buildPhaseSectionBegin + scriptString + Keys.buildPhaseSectionEnd
         }
         return scriptString
     }
-    
+
     /// - Parameter projectString: a string from project.pbxproj file.
     /// - Returns: a tuple with scripts range and scripts section string. If it is a new project, returns nils.
     private func scriptsString(fromProjectString string: String) -> (Range<String.Index>?, String?) {
@@ -129,7 +129,7 @@ final class ShellScriptsService {
 }
 
 extension ShellScriptsService.Error: CustomStringConvertible {
-    
+
     var description: String {
         switch self {
         case .scriptsReadingFailed: return "Can't find script section in project."

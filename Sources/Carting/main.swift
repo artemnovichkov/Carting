@@ -13,4 +13,3 @@ do {
 catch {
     print("❌ \(error)")
 }
-

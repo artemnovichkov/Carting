@@ -5,7 +5,7 @@
 import Foundation
 
 extension String {
-    
+
     private static let allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
     static func randomAlphaNumericString(length: Int) -> String {
@@ -16,10 +16,10 @@ extension String {
                 randomString += String(character)
             }
         }
-        
+
         return randomString
     }
-    
+
     static let tripleTab: String = "\t\t\t"
 
     var quotify: String {
