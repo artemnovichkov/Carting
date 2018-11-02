@@ -91,9 +91,7 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
-            let rawInputFileListPaths = body["inputFileListPaths"],
             let rawInputPaths = body["inputPaths"],
-            let rawOutputFileListPaths = body["outputFileListPaths"],
             let rawOutputPaths = body["outputPaths"],
             let runOnlyForDeploymentPostprocessing = body["runOnlyForDeploymentPostprocessing"],
             let shellPath = body["shellPath"],
@@ -108,10 +106,10 @@ final class ShellScriptsService {
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
                           files: files,
-                          inputFileListPaths: paths(from: rawInputFileListPaths),
+                          inputFileListPaths: paths(from: body["inputFileListPaths"]),
                           inputPaths: paths(from: rawInputPaths),
                           name: body["name"],
-                          outputFileListPaths: paths(from: rawOutputFileListPaths),
+                          outputFileListPaths: paths(from: body["outputFileListPaths"]),
                           outputPaths: paths(from: rawOutputPaths),
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
@@ -119,7 +117,10 @@ final class ShellScriptsService {
                           showEnvVarsInLog: body["showEnvVarsInLog"])
     }
 
-    private func paths(from string: String) -> [String] {
+    private func paths(from string: String?) -> [String] {
+        guard let string = string else {
+            return []
+        }
         return  string.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
             let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
             return newPath.isEmpty ? nil : newPath
