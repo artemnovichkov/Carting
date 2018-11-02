@@ -53,7 +53,9 @@ Usage: carting [command] [options]
   -p, --path:
       The project directory path.
   -f, --format:
-      Format of input/output file paths - using simple paths or xcfilelists.
+      Format of input/output file paths:
+        file - using simple paths
+        list - using xcfilelists
   info:
       Prints Carthage frameworks list with linking description.
   help:
@@ -102,8 +104,7 @@ let package = Package(
  - [x] Add support of multiple targets
  - [x] Add check of linked frameworks
  - [x] Unify errors
- - [ ] Add support of tvOS and watchOS platforms
- - [ ] Check correct work with workspaces
+ - [x] Check correct work with workspaces
  - [ ] Write tests
 
 ## Author

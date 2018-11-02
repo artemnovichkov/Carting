@@ -26,18 +26,18 @@ final class ShellScriptsService {
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
-        
+
         var scripts = [Script]()
         while !scanner.isAtEnd {
             scanner.scanUpTo(" /*", into: &identifier)
             scanner.scanString("/*", into: nil)
             scanner.scanUpTo(" */", into: &name)
-            
+
             scanner.scanUpTo(" = {", into: nil)
             scanner.scanString("= {", into: nil)
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
-            
+
             if let name = name as String?,
                 let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
@@ -47,20 +47,20 @@ final class ShellScriptsService {
         }
         return (range, scripts)
     }
-    
+
     /// - Parameters:
     ///   - scripts: an array of scripts.
     ///   - needSectionBlock: if true, returns whole section block
     /// - Returns: formatted string with all scripts for insertion into project.
     func string(from scripts: [Script], needSectionBlock: Bool = false) -> String {
         let scriptStrings: [String] = scripts.map { $0.description }
-        var scriptString = scriptStrings.joined(separator: "") + "\n"
+        var scriptString = scriptStrings.joined() + "\n"
         if needSectionBlock {
             scriptString = Keys.buildPhaseSectionBegin + scriptString + Keys.buildPhaseSectionEnd
         }
         return scriptString
     }
-    
+
     /// - Parameter projectString: a string from project.pbxproj file.
     /// - Returns: a tuple with scripts range and scripts section string. If it is a new project, returns nils.
     private func scriptsString(fromProjectString string: String) -> (Range<String.Index>?, String?) {
@@ -91,9 +91,7 @@ final class ShellScriptsService {
         guard
             let isa = body["isa"],
             let buildActionMask = body["buildActionMask"],
-            let rawInputFileListPaths = body["inputFileListPaths"],
             let rawInputPaths = body["inputPaths"],
-            let rawOutputFileListPaths = body["outputFileListPaths"],
             let rawOutputPaths = body["outputPaths"],
             let runOnlyForDeploymentPostprocessing = body["runOnlyForDeploymentPostprocessing"],
             let shellPath = body["shellPath"],
@@ -108,10 +106,10 @@ final class ShellScriptsService {
         return ScriptBody(isa: isa,
                           buildActionMask: buildActionMask,
                           files: files,
-                          inputFileListPaths: paths(from: rawInputFileListPaths),
+                          inputFileListPaths: paths(from: body["inputFileListPaths"]),
                           inputPaths: paths(from: rawInputPaths),
                           name: body["name"],
-                          outputFileListPaths: paths(from: rawOutputFileListPaths),
+                          outputFileListPaths: paths(from: body["outputFileListPaths"]),
                           outputPaths: paths(from: rawOutputPaths),
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
@@ -119,7 +117,10 @@ final class ShellScriptsService {
                           showEnvVarsInLog: body["showEnvVarsInLog"])
     }
 
-    private func paths(from string: String) -> [String] {
+    private func paths(from string: String?) -> [String] {
+        guard let string = string else {
+            return []
+        }
         return  string.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
             let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
             return newPath.isEmpty ? nil : newPath
@@ -128,7 +129,7 @@ final class ShellScriptsService {
 }
 
 extension ShellScriptsService.Error: CustomStringConvertible {
-    
+
     var description: String {
         switch self {
         case .scriptsReadingFailed: return "Can't find script section in project."

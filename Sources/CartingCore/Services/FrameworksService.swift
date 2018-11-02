@@ -9,12 +9,12 @@ final class FrameworksService {
     enum Error: Swift.Error {
         case frameworksReadingFailed
     }
-    
+
     private enum Keys {
         static let frameworkPhaseSectionBegin = "/* Begin PBXFrameworksBuildPhase section */"
         static let frameworkPhaseSectionEnd = "/* End PBXFrameworksBuildPhase section */"
     }
-    
+
     /// - Parameter string: a string from project.pbxproj file.
     /// - Returns: a tuple with a range of scripts and an array of mapped scripts.
     func scripts(fromProjectString string: String) throws -> (Range<String.Index>, [FrameworkScript]) {
@@ -23,18 +23,18 @@ final class FrameworksService {
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
-        
+
         var scripts = [FrameworkScript]()
         while !scanner.isAtEnd {
             scanner.scanUpTo(" /*", into: &identifier)
             scanner.scanString("/*", into: nil)
             scanner.scanUpTo(" */", into: &name)
-            
+
             scanner.scanUpTo(" = {", into: nil)
             scanner.scanString("= {", into: nil)
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
-            
+
             if let name = name as String?,
                 let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
@@ -44,7 +44,7 @@ final class FrameworksService {
         }
         return (range, scripts)
     }
-    
+
     /// - Parameter projectString: a string from project.pbxproj file.
     /// - Returns: a tuple with scripts range and scripts section string.
     /// - Throws: an error if there is no scripts section in project string.
@@ -56,7 +56,7 @@ final class FrameworksService {
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
         return (scriptsRange, String(string[scriptsRange]))
     }
-    
+
     /// - Parameter string: a string of script body from curly braces.
     /// - Returns: a ScriptBody instance if there are all needed keys.
     private func scanBody(fromString string: String) -> BaseScriptBody? {
@@ -92,7 +92,7 @@ final class FrameworksService {
 }
 
 extension FrameworksService.Error: CustomStringConvertible {
-    
+
     var description: String {
         switch self {
         case .frameworksReadingFailed: return "Can't find frameworks section in project."
@@ -101,11 +101,11 @@ extension FrameworksService.Error: CustomStringConvertible {
 }
 
 final class FrameworkScript {
-    
+
     let identifier: String
     let name: String
     var body: BaseScriptBody
-    
+
     init(identifier: String, name: String, body: BaseScriptBody) {
         self.identifier = identifier
         self.name = name

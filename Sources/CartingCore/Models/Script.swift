@@ -18,7 +18,7 @@ final class Script {
         string += "\t\t};"
         return string
     }
-    
+
     init(identifier: String, name: String, body: ScriptBody) {
         self.identifier = identifier
         self.name = name

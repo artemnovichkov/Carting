@@ -55,10 +55,6 @@ type_name:
 # Custom rules
 
 custom_rules:
-  enum_cases_on_newline:
-    name: "Enum cases on newline"
-    regex: "^\\s*case[\\h\\S]*,(?![^(]*\\))[^:|,]+$"
-    message: "Enum cases should always start with a newline."
   accessors_and_observers_on_newline:
     name: "Property accessors and observers on newline"
     regex: "^\\s*(get|set|didSet|willSet)[\\h\\S]\\{[\\h\\S]+$"

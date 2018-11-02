@@ -5,12 +5,12 @@
 import Foundation
 
 class BaseScriptBody {
-    
+
     let isa: String
     let buildActionMask: String
     var files: [File]
     var runOnlyForDeploymentPostprocessing: String
-    
+
     init(isa: String = "PBXShellScriptBuildPhase",
          buildActionMask: String = "2147483647",
          files: [File] = [],

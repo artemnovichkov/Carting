@@ -14,7 +14,7 @@ final class Project {
     let scriptsRange: Range<String.Index>?
     var scripts: [Script]
     var frameworkScripts: [FrameworkScript]
-    
+
     init(path: String,
          name: String,
          body: String,

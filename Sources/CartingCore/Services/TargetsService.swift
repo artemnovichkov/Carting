@@ -23,18 +23,18 @@ final class TargetsService {
         var identifier: NSString?
         var name: NSString?
         var bodyString: NSString?
-        
+
         var targets = [Target]()
         while !scanner.isAtEnd {
             scanner.scanUpTo(" /*", into: &identifier)
             scanner.scanString("/*", into: nil)
             scanner.scanUpTo(" */", into: &name)
-            
+
             scanner.scanUpTo(" = {", into: nil)
             scanner.scanString("= {", into: nil)
             scanner.scanUpTo("};", into: &bodyString)
             scanner.scanString("};", into: nil)
-            
+
             if let name = name as String?,
                 let identifier = identifier as String?,
                 let body = scanBody(fromString: bodyString! as String) {
@@ -44,12 +44,12 @@ final class TargetsService {
         }
         return (range, targets)
     }
-    
+
     /// - Parameter scripts: an array of targets.
     /// - Returns: formatted string with all targets for insertion into project.
     func string(from targets: [Target]) -> String {
         let targetStrings: [String] = targets.map { $0.description }
-        return targetStrings.joined(separator: "") + "\n"
+        return targetStrings.joined() + "\n"
     }
     
     /// - Parameter projectString: a string from project.pbxproj file.
@@ -61,11 +61,11 @@ final class TargetsService {
             let targetsEndRange = projectString.range(of: Keys.targetSectionEnd) else {
                 throw Error.targetsReadingFailed
         }
-        
+
         let targetsRange = targetsStartRange.upperBound..<targetsEndRange.lowerBound
         return (targetsRange, String(projectString[targetsRange]))
     }
-    
+
     /// - Parameter string: a string of target body from curly braces.
     /// - Returns: a TargetBody instance if there are all needed keys.
     private func scanBody(fromString string: String) -> TargetBody? {
@@ -108,7 +108,7 @@ final class TargetsService {
                           productReference: productReference,
                           productType: productType)
     }
-    
+
     /// - Parameter string: a string of build phases.
     /// - Returns: an array of mapped build phases.
     private func scanBuildPhases(fromString string: String) -> [BuildPhase] {
@@ -122,7 +122,7 @@ final class TargetsService {
             scanner.scanString("/*", into: nil)
             scanner.scanUpTo(" */,", into: &name)
             scanner.scanString("*/,", into: nil)
-            
+
             if let name = name as String?,
                 let identifier = identifier as String? {
                 let buildPhase = BuildPhase(identifier: identifier, name: name)
@@ -134,7 +134,7 @@ final class TargetsService {
 }
 
 extension TargetsService.Error: CustomStringConvertible {
-    
+
     var description: String {
         switch self {
         case .targetsReadingFailed: return "Can't find target section in project."
