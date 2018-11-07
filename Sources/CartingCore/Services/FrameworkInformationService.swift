@@ -30,7 +30,9 @@ final class FrameworkInformationService {
 
         var projectHasBeenUpdated = false
 
-        try project.targets.forEach { target in
+        try project.targets
+            .filter { $0.body.productType.isApplication }
+            .forEach { target in
             let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
             let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
             guard let script = frameworkScript else {

@@ -14,7 +14,7 @@ final class TargetBody {
     let name: String
     let productName: String
     let productReference: String
-    let productType: String
+    let productType: ProductType
 
     var description: String {
         var components = [.tripleTab + "isa = \(isa);"]
@@ -29,7 +29,7 @@ final class TargetBody {
         components.append(.tripleTab + "name = \(name);")
         components.append(.tripleTab + "productName = \(productName);")
         components.append(.tripleTab + "productReference = \(productReference);")
-        components.append(.tripleTab + "productType = \(productType);\n")
+        components.append(.tripleTab + "productType = \(productType.description);\n")
         return components.joined(separator: "\n")
     }
 
@@ -41,7 +41,7 @@ final class TargetBody {
          name: String,
          productName: String,
          productReference: String,
-         productType: String) {
+         productType: ProductType) {
         self.isa = isa
         self.buildPhases = buildPhases
         self.buildConfigurationList = buildConfigurationList
