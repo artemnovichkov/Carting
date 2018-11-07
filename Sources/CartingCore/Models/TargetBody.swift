@@ -53,23 +53,3 @@ final class TargetBody {
         self.productType = productType
     }
 }
-
-struct ProductType {
-    private let value: String
-    init(_ value: String) {
-        self.value = value
-    }
-
-    var description: String {
-        return self.value
-    }
-
-    var isApplication: Bool {
-        switch self.value {
-        case "\"com.apple.product-type.application\"":
-            return true
-        default:
-            return false
-        }
-    }
-}

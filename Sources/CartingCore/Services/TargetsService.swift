@@ -95,7 +95,7 @@ final class TargetsService {
             else {
                 return nil
         }
-        let productType = ProductType(productTypeRaw)
+        let productType = ProductType(value: productTypeRaw)
         let set = CharacterSet(charactersIn: "()")
         let rawBody = buildPhases.trimmingCharacters(in: set)
         let phases = scanBuildPhases(fromString: rawBody)
