@@ -34,7 +34,7 @@ $ carting update -s MyBestScript
 
 If there is no script with the name, Carting will add a new one.
 
-Since Xcode 10 Run Script build phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-seperated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
+Since Xcode 10 Run Script build phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-separated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
 
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
 
