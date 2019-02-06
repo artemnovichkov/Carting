@@ -67,6 +67,7 @@ Usage: carting [command] [options]
 ### Homebrew (recommended):
 
 ```bash
+$ brew tap artemnovichkov/projects
 $ brew install artemnovichkov/projects/carting
 ```
 
