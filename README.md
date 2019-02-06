@@ -68,7 +68,7 @@ Usage: carting [command] [options]
 
 ```bash
 $ brew tap artemnovichkov/projects
-$ brew install artemnovichkov/projects/carting
+$ brew install carting
 ```
 
 ### [Mint](https://github.com/yonaskolb/Mint):
