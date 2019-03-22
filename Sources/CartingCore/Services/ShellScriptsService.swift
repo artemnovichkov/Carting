@@ -107,19 +107,19 @@ final class ShellScriptsService {
                           buildActionMask: buildActionMask,
                           files: files,
                           inputFileListPaths: paths(from: body["inputFileListPaths"]),
-                          inputPaths: paths(from: rawInputPaths),
+                          inputPaths: paths(from: rawInputPaths) ?? [],
                           name: body["name"],
                           outputFileListPaths: paths(from: body["outputFileListPaths"]),
-                          outputPaths: paths(from: rawOutputPaths),
+                          outputPaths: paths(from: rawOutputPaths) ?? [],
                           runOnlyForDeploymentPostprocessing: runOnlyForDeploymentPostprocessing,
                           shellPath: shellPath,
                           shellScript: shellScript,
                           showEnvVarsInLog: body["showEnvVarsInLog"])
     }
 
-    private func paths(from string: String?) -> [String] {
+    private func paths(from string: String?) -> [String]? {
         guard let string = string else {
-            return []
+            return nil
         }
         return  string.components(separatedBy: "\n").dropFirst().dropLast().compactMap { path -> String? in
             let newPath = path.deleting(prefix: "\t\t\t\t\"").deleting(suffix: "\",")
