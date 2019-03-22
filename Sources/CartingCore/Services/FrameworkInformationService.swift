@@ -33,113 +33,113 @@ final class FrameworkInformationService {
         try project.targets
             .filter { $0.body.productType.isApplication }
             .forEach { target in
-            let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
-            let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
-            guard let script = frameworkScript else {
-                return
-            }
-            let linkedCarthageDynamicFrameworkNames = try frameworksInformation()
-                .filter { information in
-                    information.linking == .dynamic && script.body.files.contains { $0.name == information.name }
+                let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
+                let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
+                guard let script = frameworkScript else {
+                    return
                 }
-                .map { $0.name }
+                let linkedCarthageDynamicFrameworkNames = try frameworksInformation()
+                    .filter { information in
+                        information.linking == .dynamic && script.body.files.contains { $0.name == information.name }
+                    }
+                    .map { $0.name }
 
-            let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
-                                                  type: .input)
-            let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
-                                                   type: .output)
+                let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                      type: .input)
+                let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                       type: .output)
 
-            let carthageFolder = try projectFolder.subfolder(named: "Carthage")
-            let listFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
-            let parent = carthageFolder.parent ?? projectFolder
-            let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                let carthageFolder = try projectFolder.subfolder(named: "Carthage")
+                let listFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+                let parent = carthageFolder.parent ?? projectFolder
+                let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
-            let inputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-inputPaths.xcfilelist")
-            try inputFileList.write(string: inputPaths.joined(separator: "\n"))
-            let inputFileListPath = [path, inputFileList.name].joined(separator: "/")
+                let inputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-inputPaths.xcfilelist")
+                try inputFileList.write(string: inputPaths.joined(separator: "\n"))
+                let inputFileListPath = [path, inputFileList.name].joined(separator: "/")
 
-            let outputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-outputPaths.xcfilelist")
-            try outputFileList.write(string: outputPaths.joined(separator: "\n"))
-            let outputFileListPath = [path, outputFileList.name].joined(separator: "/")
+                let outputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-outputPaths.xcfilelist")
+                try outputFileList.write(string: outputPaths.joined(separator: "\n"))
+                let outputFileListPath = [path, outputFileList.name].joined(separator: "/")
 
-            let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
-            let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
+                let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
+                let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
-            if let carthage = carthageScript {
-                var scriptHasBeenUpdated = false
+                if let carthage = carthageScript {
+                    var scriptHasBeenUpdated = false
 
-                switch format {
-                case .file:
-                    if carthage.body.inputFileListPaths?.isEmpty == false {
-                        carthage.body.inputFileListPaths?.removeAll()
-                        scriptHasBeenUpdated = true
+                    switch format {
+                    case .file:
+                        if carthage.body.inputFileListPaths?.isEmpty == false {
+                            carthage.body.inputFileListPaths?.removeAll()
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.inputPaths != inputPaths {
+                            carthage.body.inputPaths = inputPaths
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.outputFileListPaths?.isEmpty == false {
+                            carthage.body.outputFileListPaths?.removeAll()
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.outputPaths != outputPaths {
+                            carthage.body.outputPaths = outputPaths
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.shellScript != Keys.carthageScript {
+                            carthage.body.shellScript = Keys.carthageScript
+                            scriptHasBeenUpdated = true
+                        }
+                    case .list:
+                        if !carthage.body.inputPaths.isEmpty {
+                            carthage.body.inputPaths.removeAll()
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.inputFileListPaths?.first != inputFileListPath {
+                            carthage.body.inputFileListPaths = [inputFileListPath]
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.outputFileListPaths?.first != outputFileListPath {
+                            carthage.body.outputFileListPaths = [outputFileListPath]
+                            scriptHasBeenUpdated = true
+                        }
+                        if !carthage.body.outputPaths.isEmpty {
+                            carthage.body.outputPaths.removeAll()
+                            scriptHasBeenUpdated = true
+                        }
+                        if carthage.body.shellScript != Keys.carthageScript {
+                            carthage.body.shellScript = Keys.carthageScript
+                            scriptHasBeenUpdated = true
+                        }
                     }
-                    if carthage.body.inputPaths != inputPaths {
-                        carthage.body.inputPaths = inputPaths
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.outputFileListPaths?.isEmpty == false {
-                        carthage.body.outputFileListPaths?.removeAll()
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.outputPaths != outputPaths {
-                        carthage.body.outputPaths = outputPaths
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.shellScript != Keys.carthageScript {
-                        carthage.body.shellScript = Keys.carthageScript
-                        scriptHasBeenUpdated = true
-                    }
-                case .list:
-                    if !carthage.body.inputPaths.isEmpty {
-                        carthage.body.inputPaths.removeAll()
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.inputFileListPaths?.first != inputFileListPath {
-                        carthage.body.inputFileListPaths = [inputFileListPath]
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.outputFileListPaths?.first != outputFileListPath {
-                        carthage.body.outputFileListPaths = [outputFileListPath]
-                        scriptHasBeenUpdated = true
-                    }
-                    if !carthage.body.outputPaths.isEmpty {
-                        carthage.body.outputPaths.removeAll()
-                        scriptHasBeenUpdated = true
-                    }
-                    if carthage.body.shellScript != Keys.carthageScript {
-                        carthage.body.shellScript = Keys.carthageScript
-                        scriptHasBeenUpdated = true
+                    if scriptHasBeenUpdated {
+                        projectHasBeenUpdated = true
+                        print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
                     }
                 }
-                if scriptHasBeenUpdated {
+                else {
+                    let body: ScriptBody
+                    switch format {
+                    case .file:
+                        body = ScriptBody(inputPaths: inputPaths,
+                                          name: scriptName,
+                                          outputPaths: outputPaths,
+                                          shellScript: Keys.carthageScript)
+                    case .list:
+                        body = ScriptBody(inputFileListPaths: [inputFileListPath],
+                                          name: scriptName,
+                                          outputFileListPaths: [outputFileListPath],
+                                          shellScript: Keys.carthageScript)
+                    }
+
+                    let identifier = String.randomAlphaNumericString(length: 24)
+                    let script = Script(identifier: identifier, name: scriptName, body: body)
+                    let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
+                    project.scripts.append(script)
+                    target.body.buildPhases.append(buildPhase)
+                    print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     projectHasBeenUpdated = true
-                    print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
                 }
-            }
-            else {
-                let body: ScriptBody
-                switch format {
-                case .file:
-                    body = ScriptBody(inputPaths: inputPaths,
-                                      name: scriptName,
-                                      outputPaths: outputPaths,
-                                      shellScript: Keys.carthageScript)
-                case .list:
-                    body = ScriptBody(inputFileListPaths: [inputFileListPath],
-                                      name: scriptName,
-                                      outputFileListPaths: [outputFileListPath],
-                                      shellScript: Keys.carthageScript)
-                }
-
-                let identifier = String.randomAlphaNumericString(length: 24)
-                let script = Script(identifier: identifier, name: scriptName, body: body)
-                let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
-                project.scripts.append(script)
-                target.body.buildPhases.append(buildPhase)
-                print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
-                projectHasBeenUpdated = true
-            }
         }
 
         if projectHasBeenUpdated {

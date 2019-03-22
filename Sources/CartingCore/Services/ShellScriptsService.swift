@@ -14,7 +14,7 @@ final class ShellScriptsService {
         static let buildPhaseSectionBegin = "/* Begin PBXShellScriptBuildPhase section */"
         static let buildPhaseSectionEnd = "/* End PBXShellScriptBuildPhase section */"
     }
-    
+
     /// - Parameter string: a string from project.pbxproj file.
     /// - Returns: a tuple with a range of scripts and an array of mapped scripts. If it is a new project, returns no range and empty array.
     func scripts(fromProjectString string: String) -> (Range<String.Index>?, [Script]) {
