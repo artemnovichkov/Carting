@@ -116,7 +116,7 @@ final class TargetsService {
         let scanner = Scanner(string: string)
         var identifier: NSString?
         var name: NSString?
-        
+
         var buildPhases = [BuildPhase]()
         while !scanner.isAtEnd {
             scanner.scanUpTo(" /*", into: &identifier)
