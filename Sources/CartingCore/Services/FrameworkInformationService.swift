@@ -70,16 +70,16 @@ final class FrameworkInformationService {
 
                 switch format {
                 case .file:
-                    if !carthage.body.inputFileListPaths.isEmpty {
-                        carthage.body.inputFileListPaths.removeAll()
+                    if carthage.body.inputFileListPaths?.isEmpty == false {
+                        carthage.body.inputFileListPaths?.removeAll()
                         scriptHasBeenUpdated = true
                     }
                     if carthage.body.inputPaths != inputPaths {
                         carthage.body.inputPaths = inputPaths
                         scriptHasBeenUpdated = true
                     }
-                    if !carthage.body.outputFileListPaths.isEmpty {
-                        carthage.body.outputFileListPaths.removeAll()
+                    if carthage.body.outputFileListPaths?.isEmpty == false {
+                        carthage.body.outputFileListPaths?.removeAll()
                         scriptHasBeenUpdated = true
                     }
                     if carthage.body.outputPaths != outputPaths {
@@ -95,11 +95,11 @@ final class FrameworkInformationService {
                         carthage.body.inputPaths.removeAll()
                         scriptHasBeenUpdated = true
                     }
-                    if carthage.body.inputFileListPaths.count > 1 || carthage.body.inputFileListPaths.first != inputFileListPath {
+                    if carthage.body.inputFileListPaths?.first != inputFileListPath {
                         carthage.body.inputFileListPaths = [inputFileListPath]
                         scriptHasBeenUpdated = true
                     }
-                    if carthage.body.outputFileListPaths.count > 1 || carthage.body.outputFileListPaths.first != outputFileListPath {
+                    if carthage.body.outputFileListPaths?.first != outputFileListPath {
                         carthage.body.outputFileListPaths = [outputFileListPath]
                         scriptHasBeenUpdated = true
                     }

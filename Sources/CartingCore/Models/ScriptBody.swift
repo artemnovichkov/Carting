@@ -6,10 +6,10 @@ import Foundation
 
 final class ScriptBody: BaseScriptBody {
 
-    var inputFileListPaths: [String]
+    var inputFileListPaths: [String]?
     var inputPaths: [String]
     let name: String?
-    var outputFileListPaths: [String]
+    var outputFileListPaths: [String]?
     var outputPaths: [String]
     var shellPath: String
     var shellScript: String
@@ -23,10 +23,12 @@ final class ScriptBody: BaseScriptBody {
             components.append(String.tripleTab + "\t\(file.identifier) /* \(file.name) in \(file.folder) */,")
         }
         components.append(.tripleTab + ");")
-        let rawInputFileListPaths = inputFileListPaths.reduce("") { result, path in
-            result + "\t\t\t\t\"" + path + "\",\n"
+        if let inputFileListPaths = inputFileListPaths {
+            let rawInputFileListPaths = inputFileListPaths.reduce("") { result, path in
+                result + "\t\t\t\t\"" + path + "\",\n"
+            }
+            components.append(.tripleTab + "inputFileListPaths = (\n\(rawInputFileListPaths)\t\t\t);")
         }
-        components.append(.tripleTab + "inputFileListPaths = (\n\(rawInputFileListPaths)\t\t\t);")
         let rawInputPaths = inputPaths.reduce("") { result, path in
             result + "\t\t\t\t\"" + path + "\",\n"
         }
@@ -34,10 +36,12 @@ final class ScriptBody: BaseScriptBody {
         if let name = name {
             components.append(.tripleTab + "name = \(name);")
         }
-        let rawOutputFileListPaths = outputFileListPaths.reduce("") { result, path in
-            result + "\t\t\t\t\"" + path + "\",\n"
+        if let outputFileListPaths = outputFileListPaths {
+            let rawOutputFileListPaths = outputFileListPaths.reduce("") { result, path in
+                result + "\t\t\t\t\"" + path + "\",\n"
+            }
+            components.append(.tripleTab + "outputFileListPaths = (\n\(rawOutputFileListPaths)\t\t\t);")
         }
-        components.append(.tripleTab + "outputFileListPaths = (\n\(rawOutputFileListPaths)\t\t\t);")
         let rawOutputPaths = outputPaths.reduce("") { result, path in
             result + "\t\t\t\t\"" + path + "\",\n"
         }
