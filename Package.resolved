@@ -6,17 +6,17 @@
         "repositoryURL": "https://github.com/johnsundell/files.git",
         "state": {
           "branch": null,
-          "revision": "06f95bd1bf4f8d5f50bc6bb30b808c253acd4c88",
-          "version": "2.2.1"
+          "revision": "7de5a7b9627e8f2f88eba8a899ce8ddf2c64d39d",
+          "version": "3.0.0"
         }
       },
       {
         "package": "ShellOut",
-        "repositoryURL": "https://github.com/JohnSundell/ShellOut.git",
+        "repositoryURL": "https://github.com/johnsundell/shellout.git",
         "state": {
           "branch": null,
-          "revision": "f1c253a34a40df4bfd268b09fdb101b059f6d52d",
-          "version": "2.1.0"
+          "revision": "d3d54ce662dfee7fef619330b71d251b8d4869f9",
+          "version": "2.2.0"
         }
       }
     ]

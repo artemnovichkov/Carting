@@ -14,7 +14,7 @@ final class TargetsService {
         static let targetSectionBegin = "/* Begin PBXNativeTarget section */"
         static let targetSectionEnd = "/* End PBXNativeTarget section */"
     }
-    
+
     /// - Parameter string: a string from project.pbxproj file.
     /// - Returns: a tuple with a range of scripts and an array of mapped targets.
     func targets(fromProjectString string: String) throws -> (Range<String.Index>, [Target]) {

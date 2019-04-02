@@ -9,7 +9,7 @@ let package = Package(
         .library(name: "Carting", targets: ["CartingCore"])
     ],
     dependencies: [
-        .package(url: "https://github.com/johnsundell/files.git", from: "2.0.0"),
+        .package(url: "https://github.com/johnsundell/files.git", from: "3.0.0"),
         .package(url: "https://github.com/johnsundell/shellout.git", from: "2.0.0")
     ],
     targets: [
