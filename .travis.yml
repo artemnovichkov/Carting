@@ -1,6 +1,6 @@
 env:
   global:
-    - SWIFT_BRANCH=swift-5.0.1-branch
+    - SWIFT_BRANCH=swift-5.0.1-release
     - SWIFT_VERSION=swift-5.0.1-RELEASE
 matrix:
   include:
