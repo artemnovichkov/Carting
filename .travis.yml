@@ -1,11 +1,28 @@
-os:
-  - linux
-  - osx
-language: generic
-sudo: required
-dist: trusty
-osx_image: xcode10
-install:
-  - eval "$(curl -sL https://swiftenv.fuller.li/install.sh)"
-script:
-  - swift build
+env:
+  global:
+    - SWIFT_BRANCH=swift-5.0.1-branch
+    - SWIFT_VERSION=swift-5.0.1-RELEASE
+matrix:
+  include:
+    - os: linux
+      language: generic
+      dist: trusty
+      sudo: required
+      install:
+        - sudo apt-get install clang libicu-dev
+        - mkdir swift
+        - curl https://swift.org/builds/$SWIFT_BRANCH/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu18.04.tar.gz -s | tar xz -C swift &> /dev/null
+        - export PATH="$(pwd)/swift/$SWIFT_VERSION-ubuntu18.04/usr/bin:$PATH"
+      script:
+        - swift build
+
+    - os: osx
+      osx_image: xcode9.3
+      language: swift
+      sudo: required
+      install:
+        - wget https://swift.org/builds/$SWIFT_BRANCH/xcode/$SWIFT_VERSION/$SWIFT_VERSION-osx.pkg
+        - sudo installer -pkg $SWIFT_VERSION-osx.pkg -target /
+        - export PATH="/Library/Developer/Toolchains/$SWIFT_VERSION.xctoolchain/usr/bin:$PATH"
+      script:
+        - swift build
