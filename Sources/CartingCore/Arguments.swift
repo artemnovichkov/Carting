@@ -21,6 +21,7 @@ struct Arguments {
     var command: Command = .help
     var path: String?
     var format: Format = .list
+    var targetName: String?
 
     init?(arguments: [String]) {
         for (index, argument) in arguments.enumerated() {
@@ -40,6 +41,10 @@ struct Arguments {
                 if arguments.count > formatIndex, let format = Format(rawValue: arguments[formatIndex]) {
                     self.format = format
                 }
+            case "-t", "--target":
+                let targetIndex = index + 1
+                let targetName = arguments.count > targetIndex ? arguments[targetIndex] : nil
+                self.targetName = targetName
             case "info":
                 command = .info
             case "help":
