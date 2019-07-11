@@ -5,11 +5,11 @@
 import Foundation
 
 final class Script {
-    
+
     let identifier: String
     let name: String
     var body: ScriptBody
-    
+
     var description: String {
         var string = "\n\t\t" + identifier
         string += " /* \(name) */"
