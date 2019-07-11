@@ -5,7 +5,7 @@
 import Foundation
 
 final class FrameworksService {
-    
+
     enum Error: Swift.Error {
         case frameworksReadingFailed
     }

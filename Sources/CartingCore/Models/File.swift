@@ -5,11 +5,11 @@
 import Foundation
 
 final class File {
-    
+
     let identifier: String
     let name: String
     let folder: String
-    
+
     init(identifier: String, name: String, folder: String) {
         self.identifier = identifier
         self.name = name

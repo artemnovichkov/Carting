@@ -5,11 +5,11 @@
 import Foundation
 
 final class TargetsService {
-    
+
     enum Error: Swift.Error {
         case targetsReadingFailed
     }
-    
+
     private enum Keys {
         static let targetSectionBegin = "/* Begin PBXNativeTarget section */"
         static let targetSectionEnd = "/* End PBXNativeTarget section */"
@@ -51,7 +51,7 @@ final class TargetsService {
         let targetStrings: [String] = targets.map { $0.description }
         return targetStrings.joined() + "\n"
     }
-    
+
     /// - Parameter projectString: a string from project.pbxproj file.
     /// - Returns: a tuple with targets range and targets section string.
     /// - Throws: an error if there is no targets section in project string.

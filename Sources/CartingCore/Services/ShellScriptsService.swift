@@ -5,11 +5,11 @@
 import Foundation
 
 final class ShellScriptsService {
-    
+
     enum Error: Swift.Error {
         case scriptsReadingFailed
     }
-    
+
     private enum Keys {
         static let buildPhaseSectionBegin = "/* Begin PBXShellScriptBuildPhase section */"
         static let buildPhaseSectionEnd = "/* End PBXShellScriptBuildPhase section */"
@@ -71,7 +71,7 @@ final class ShellScriptsService {
         let scriptsRange = startRange.upperBound..<endRange.lowerBound
         return (scriptsRange, String(string[scriptsRange]))
     }
-    
+
     /// - Parameter string: a string of script body from curly braces.
     /// - Returns: a ScriptBody instance if there are all needed keys.
     private func scanBody(fromString string: String) -> ScriptBody? {

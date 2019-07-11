@@ -43,7 +43,7 @@ final class FrameworkInformationService {
                     return target.name.lowercased() == targetName.lowercased()
                 }
                 return true
-        }
+            }
 
         if let targetName = targetName, filteredTargets.isEmpty {
             throw Error.targetFilterFailed(name: targetName)
@@ -158,7 +158,7 @@ final class FrameworkInformationService {
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     projectHasBeenUpdated = true
                 }
-        }
+            }
 
         if projectHasBeenUpdated {
             try projectService.update(project)
@@ -207,7 +207,7 @@ func getEnvironmentVar(_ name: String) -> String? {
 struct FrameworkInformation {
 
     enum Architecture: String {
-        case i386, x86_64, armv7, arm64
+        case i386, x86_64, armv7, arm64 //swiftlint:disable:this identifier_name
     }
 
     enum Linking: String {

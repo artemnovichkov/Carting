@@ -3,6 +3,7 @@
 excluded:
   - Carthage/
   - Pods/
+  - .build/
 
 # Rules
 
@@ -20,6 +21,10 @@ opt_in_rules:
   - prohibited_super_call
   - sorted_first_last
   - untyped_error_in_catch
+
+disabled_rules:
+  - cyclomatic_complexity
+  - function_body_length
 
 force_cast: error
 force_try: error

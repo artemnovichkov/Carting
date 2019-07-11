@@ -5,7 +5,7 @@
 import Foundation
 
 class FilesService {
-    
+
     static func scanFiles(fromString string: String) -> [File] {
         let scanner = Scanner(string: string.trimmingCharacters(in: CharacterSet(charactersIn: "()")))
         var identifier: NSString?
