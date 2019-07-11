@@ -20,23 +20,20 @@ public class UpdateCommand: Command {
         let subparser = parser.add(subparser: command, overview: overview)
         name = subparser.add(option: "--script",
                              shortName: "-s",
-                             kind: String.self,
                              usage: "The name of Carthage script.")
         path = subparser.add(option: "--path",
                              shortName: "-p",
-                             kind: String.self,
                              usage: "The project directory path.")
         format = subparser.add(option: "--format",
                                shortName: "-f",
-                               kind: Format.self,
                                usage: """
 Format of input/output file paths:
             file - using simple paths
             list - using xcfilelists
-""")
+""",
+                               completion: Format.completion)
         targetName = subparser.add(option: "--target",
                                    shortName: "-t",
-                                   kind: String.self,
                                    usage: "The name of target.")
     }
 
@@ -50,5 +47,12 @@ Format of input/output file paths:
                                                      path: path,
                                                      format: format,
                                                      targetName: targetName)
+    }
+}
+
+extension ArgumentParser {
+
+    func add<T: ArgumentKind>(option: String, shortName: String? = nil, usage: String? = nil, completion: ShellCompletion? = nil) -> OptionArgument<T> {
+        return add(option: option, shortName: shortName, kind: T.self, usage: usage, completion: completion)
     }
 }
