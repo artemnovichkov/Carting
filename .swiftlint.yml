@@ -3,6 +3,7 @@
 excluded:
   - Carthage/
   - Pods/
+  - .build/
 
 # Rules
 
