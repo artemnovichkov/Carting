@@ -5,10 +5,11 @@
 import Foundation
 import CartingCore
 
-let carting = Carting()
-
 do {
-    try carting.run()
+    let registry = CommandRegistry(usage: "<command> <options>",
+                                   overview: "🚘 Simple tool for updating Carthage script phase")
+    registry.register(UpdateCommand.self, InfoCommand.self)
+    try registry.run()
 }
 catch {
     print("❌ \(error)")

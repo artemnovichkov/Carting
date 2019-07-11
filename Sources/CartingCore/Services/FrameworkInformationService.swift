@@ -29,7 +29,7 @@ final class FrameworkInformationService {
 
     // MARK: - Lifecycle
 
-    func updateScript(withName scriptName: String, path: String?, format: Arguments.Format, targetName: String?) throws {
+    func updateScript(withName scriptName: String, path: String?, format: Format, targetName: String?) throws {
         let project = try projectService.project(path)
 
         var needUpdateProject = false
