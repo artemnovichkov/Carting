@@ -32,7 +32,8 @@ final class FrameworkInformationService {
     func updateScript(withName scriptName: String, path: String?, format: Arguments.Format, targetName: String?) throws {
         let project = try projectService.project(path)
 
-        var projectHasBeenUpdated = false
+        var needUpdateProject = false
+        var filelistsWereUpdated = false
 
         let filteredTargets = project.targets
             .filter { target in
@@ -49,6 +50,11 @@ final class FrameworkInformationService {
             throw Error.targetFilterFailed(name: targetName)
         }
 
+        let carthageDynamicFrameworks = try frameworksInformation()
+            .filter { information in
+                information.linking == .dynamic
+            }
+
         try filteredTargets
             .forEach { target in
                 let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
@@ -56,9 +62,9 @@ final class FrameworkInformationService {
                 guard let script = frameworkScript else {
                     return
                 }
-                let linkedCarthageDynamicFrameworkNames = try frameworksInformation()
+                let linkedCarthageDynamicFrameworkNames = carthageDynamicFrameworks
                     .filter { information in
-                        information.linking == .dynamic && script.body.files.contains { $0.name == information.name }
+                        script.body.files.contains { $0.name == information.name }
                     }
                     .map { $0.name }
 
@@ -72,13 +78,32 @@ final class FrameworkInformationService {
                 let parent = carthageFolder.parent ?? projectFolder
                 let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
-                let inputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-inputPaths.xcfilelist")
-                try inputFileList.write(string: inputPaths.joined(separator: "\n"))
-                let inputFileListPath = [path, inputFileList.name].joined(separator: "/")
+                func updateFile(withName name: String, content: String) throws -> String {
+                    if listFolder.containsFile(named: name) {
+                        let file = try listFolder.file(named: name)
+                        if let oldContent = try? file.readAsString(),
+                            oldContent != content {
+                            try file.write(string: content)
+                            filelistsWereUpdated = true
+                            print("✅ \(file.name) was successfully updated")
+                        }
+                    }
+                    else {
+                        let file = try listFolder.createFile(named: name)
+                        try file.write(string: content)
+                        filelistsWereUpdated = true
+                        print("✅ \(file.name) was successfully added")
+                    }
+                    return [path, name].joined(separator: "/")
+                }
 
-                let outputFileList = try listFolder.createFileIfNeeded(withName: "\(target.name)-outputPaths.xcfilelist")
-                try outputFileList.write(string: outputPaths.joined(separator: "\n"))
-                let outputFileListPath = [path, outputFileList.name].joined(separator: "/")
+                let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
+                let inputFileListNewContent = inputPaths.joined(separator: "\n")
+                let inputFileListPath = try updateFile(withName: inputFileListFileName, content: inputFileListNewContent)
+
+                let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
+                let outputFileListNewContent = outputPaths.joined(separator: "\n")
+                let outputFileListPath = try updateFile(withName: outputFileListFileName, content: outputFileListNewContent)
 
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
@@ -131,7 +156,7 @@ final class FrameworkInformationService {
                         }
                     }
                     if scriptHasBeenUpdated {
-                        projectHasBeenUpdated = true
+                        needUpdateProject = true
                         print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
                     }
                 }
@@ -156,14 +181,14 @@ final class FrameworkInformationService {
                     project.scripts.append(script)
                     target.body.buildPhases.append(buildPhase)
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
-                    projectHasBeenUpdated = true
+                    needUpdateProject = true
                 }
             }
 
-        if projectHasBeenUpdated {
+        if needUpdateProject {
             try projectService.update(project)
         }
-        else {
+        else if !filelistsWereUpdated {
             print("🤷‍♂️ Nothing to update.")
         }
     }

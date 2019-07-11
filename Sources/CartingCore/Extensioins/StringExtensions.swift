@@ -9,15 +9,7 @@ extension String {
     private static let allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
     static func randomAlphaNumericString(length: Int) -> String {
-        var randomString = ""
-
-        for _ in 0..<length {
-            if let character = allowedChars.randomElement() {
-                randomString += String(character)
-            }
-        }
-
-        return randomString
+        return String((0..<length).compactMap { _ in allowedChars.randomElement() })
     }
 
     static let tripleTab: String = "\t\t\t"
@@ -39,13 +31,4 @@ extension String {
         }
         return String(dropLast(suffix.count))
     }
-
-    #if swift(>=4.2)
-    #else
-    func randomElement() -> Character? {
-        let randomNumber = Int(arc4random_uniform(UInt32(count)))
-        let randomIndex = index(startIndex, offsetBy: randomNumber)
-        return self[randomIndex]
-    }
-    #endif
 }
