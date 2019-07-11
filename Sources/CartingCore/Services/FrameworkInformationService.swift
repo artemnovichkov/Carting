@@ -8,6 +8,10 @@ import Foundation
 
 final class FrameworkInformationService {
 
+    enum Error: Swift.Error {
+        case targetFilterFailed(name: String)
+    }
+
     private enum Keys {
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
@@ -25,13 +29,27 @@ final class FrameworkInformationService {
 
     // MARK: - Lifecycle
 
-    func updateScript(withName scriptName: String, path: String?, format: Arguments.Format) throws {
+    func updateScript(withName scriptName: String, path: String?, format: Arguments.Format, targetName: String?) throws {
         let project = try projectService.project(path)
 
         var projectHasBeenUpdated = false
 
-        try project.targets
-            .filter { $0.body.productType.isApplication }
+        let filteredTargets = project.targets
+            .filter { target in
+                guard target.body.productType.isApplication else {
+                    return false
+                }
+                if let targetName = targetName {
+                    return target.name.lowercased() == targetName.lowercased()
+                }
+                return true
+        }
+
+        if let targetName = targetName, filteredTargets.isEmpty {
+            throw Error.targetFilterFailed(name: targetName)
+        }
+
+        try filteredTargets
             .forEach { target in
                 let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
                 let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
@@ -210,4 +228,13 @@ func linking(fromOutput output: String) -> FrameworkInformation.Linking {
 
 func architectures(fromOutput output: String) -> [FrameworkInformation.Architecture] {
     return output.components(separatedBy: " ").compactMap(FrameworkInformation.Architecture.init)
+}
+
+extension FrameworkInformationService.Error: CustomStringConvertible {
+
+    var description: String {
+        switch self {
+        case .targetFilterFailed(let name): return "There is no target with \(name) name."
+        }
+    }
 }
