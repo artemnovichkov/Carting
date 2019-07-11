@@ -50,6 +50,8 @@ Usage: carting [command] [options]
       Adds a new script with input/output file paths or updates the script named `Carthage`.
   -s, --script:
       The name of Carthage script.
+  -t, --target:
+      The name of target.
   -p, --path:
       The project directory path.
   -f, --format:
