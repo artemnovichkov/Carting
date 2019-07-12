@@ -1,4 +1,4 @@
-// swift-tools-version:4.0
+// swift-tools-version:5.0
 
 import PackageDescription
 
@@ -10,10 +10,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/JohnSundell/Files.git", from: "3.0.0"),
-        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "2.0.0")
+        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-package-manager.git", from: "0.0.0")
     ],
     targets: [
-        .target(name: "Carting", dependencies: ["CartingCore"]),
+        .target(name: "Carting", dependencies: ["CartingCore", "SPMUtility"]),
         .target(name: "CartingCore", dependencies: ["Files", "ShellOut"])
     ]
 )

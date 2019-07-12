@@ -1,8 +1,6 @@
 //
-//  Created by Artem Novichkov on 29/06/2017.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
-
-import Foundation
 
 final class ScriptBody: BaseScriptBody {
 
@@ -59,7 +57,7 @@ final class ScriptBody: BaseScriptBody {
     }
 
     init(isa: String = "PBXShellScriptBuildPhase",
-         buildActionMask: String = "2147483647",
+         buildActionMask: String = "\(Int32.max)",
          files: [File] = [],
          inputFileListPaths: [String]? = nil,
          inputPaths: [String] = [],

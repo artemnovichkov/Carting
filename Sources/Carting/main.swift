@@ -1,14 +1,15 @@
 //
-//  Created by Artem Novichkov on 01/07/2017.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
 import Foundation
 import CartingCore
 
-let carting = Carting()
-
 do {
-    try carting.run()
+    let registry = CommandRegistry(usage: "<command> <options>",
+                                   overview: "🚘 Simple tool for updating Carthage script phase")
+    registry.register(UpdateCommand.self, InfoCommand.self)
+    try registry.run()
 }
 catch {
     print("❌ \(error)")

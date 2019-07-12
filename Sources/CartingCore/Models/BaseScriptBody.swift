@@ -1,8 +1,6 @@
 //
-//  Created by Artem Novichkov on 08/07/2017.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
-
-import Foundation
 
 class BaseScriptBody {
 
@@ -12,7 +10,7 @@ class BaseScriptBody {
     var runOnlyForDeploymentPostprocessing: String
 
     init(isa: String = "PBXShellScriptBuildPhase",
-         buildActionMask: String = "2147483647",
+         buildActionMask: String = "\(Int32.max)",
          files: [File] = [],
          runOnlyForDeploymentPostprocessing: String = "0") {
         self.isa = isa

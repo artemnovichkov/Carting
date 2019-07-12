@@ -1,10 +1,9 @@
 //
-// Created by Alexey Korolev on 07/11/2018.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
-import Foundation
-
 struct ProductType {
+    
     private let value: String
 
     init(value: String) {

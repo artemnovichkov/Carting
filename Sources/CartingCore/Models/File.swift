@@ -1,8 +1,6 @@
 //
-//  Created by Artem Novichkov on 08/07/2017.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
-
-import Foundation
 
 final class File {
 
