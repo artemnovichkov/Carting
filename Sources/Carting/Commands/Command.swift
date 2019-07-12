@@ -4,7 +4,7 @@
 
 import SPMUtility
 
-public protocol Command {
+protocol Command {
 
     var command: String { get }
     var overview: String { get }

@@ -3,19 +3,17 @@
 //
 
 import SPMUtility
+import CartingCore
 
-enum Format: String, ArgumentKind, CaseIterable {
+extension Format: ArgumentKind {
 
     enum Error: Swift.Error {
         case invalid
     }
 
-    case file
-    case list
+    public static let completion: ShellCompletion = .values(Format.allCases.map { ($0.rawValue, $0.rawValue) })
 
-    static let completion: ShellCompletion = .values(Format.allCases.map { ($0.rawValue, $0.rawValue) })
-
-    init(argument: String) throws {
+    public init(argument: String) throws {
         guard let format = Format(rawValue: argument.lowercased()) else {
             throw Error.invalid
         }

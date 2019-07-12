@@ -5,24 +5,24 @@
 import SPMUtility
 import Basic
 
-public class CommandRegistry {
+class CommandRegistry {
 
     private let parser: ArgumentParser
     private var commands: [Command] = []
 
-    public init(usage: String, overview: String) {
+    init(usage: String, overview: String) {
         parser = ArgumentParser(usage: usage, overview: overview)
     }
 
-    public func register(_ command: Command.Type) {
+    func register(_ command: Command.Type) {
         commands.append(command.init(parser: parser))
     }
 
-    public func register(_ commands: Command.Type...) {
+    func register(_ commands: Command.Type...) {
         commands.forEach(register)
     }
 
-    public func run() throws {
+    func run() throws {
         let arguments = try parse()
         try process(arguments)
     }

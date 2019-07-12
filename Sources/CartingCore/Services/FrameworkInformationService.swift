@@ -6,7 +6,7 @@ import Files
 import ShellOut
 import Foundation
 
-final class FrameworkInformationService {
+public final class FrameworkInformationService {
 
     enum Error: Swift.Error {
         case targetFilterFailed(name: String)
@@ -16,7 +16,7 @@ final class FrameworkInformationService {
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
 
-    var path: String?
+    public var path: String?
 
     private var projectFolder: Folder {
         if let path = path, let folder = try? Folder(path: path) {
@@ -29,7 +29,10 @@ final class FrameworkInformationService {
 
     // MARK: - Lifecycle
 
-    func updateScript(withName scriptName: String, path: String?, format: Format, targetName: String?) throws {
+    public init() {
+    }
+
+    public func updateScript(withName scriptName: String, path: String?, format: Format, targetName: String?) throws {
         let project = try projectService.project(path)
 
         var needUpdateProject = false
@@ -169,7 +172,7 @@ final class FrameworkInformationService {
         return try frameworks.map(information)
     }
 
-    func printFrameworksInformation() throws {
+    public func printFrameworksInformation() throws {
         let informations = try frameworksInformation()
         informations.forEach { information in
             let description = [information.name, information.linking.rawValue].joined(separator: "\t\t") +
