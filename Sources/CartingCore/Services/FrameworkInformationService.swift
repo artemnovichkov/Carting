@@ -102,32 +102,11 @@ public final class FrameworkInformationService {
                     case .file:
                         scriptHasBeenUpdated = carthage.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
-                        func updateFile(withName name: String, content: String) throws {
-                            if listsFolder.containsFile(named: name) {
-                                let file = try listsFolder.file(named: name)
-                                if let oldContent = try? file.readAsString(),
-                                    oldContent != content {
-                                    try shellOut(to: "chmod +w \(file.name)", at: listsFolder.path)
-                                    try file.write(string: content)
-                                    filelistsWereUpdated = true
-                                    print("✅ \(file.name) was successfully updated")
-                                    try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
-                                }
-                            }
-                            else {
-                                let file = try listsFolder.createFile(named: name)
-                                try file.write(string: content)
-                                filelistsWereUpdated = true
-                                print("✅ \(file.name) was successfully added")
-                                try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
-                            }
-                        }
-
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
-                        try updateFile(withName: inputFileListFileName, content: inputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: inputFileListFileName, content: inputFileListNewContent)
 
                         let outputFileListNewContent = outputPaths.joined(separator: "\n")
-                        try updateFile(withName: outputFileListFileName, content: outputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: outputFileListFileName, content: outputFileListNewContent)
 
                         scriptHasBeenUpdated = carthage.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
                     }
@@ -151,11 +130,7 @@ public final class FrameworkInformationService {
                                           shellScript: Keys.carthageScript)
                     }
 
-                    let identifier = String.randomAlphaNumericString(length: 24)
-                    let script = Script(identifier: identifier, name: scriptName, body: body)
-                    let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
-                    project.scripts.append(script)
-                    target.body.buildPhases.append(buildPhase)
+                    project.addScript(withName: scriptName, body: body, to: target)
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     needUpdateProject = true
                 }
@@ -195,6 +170,29 @@ public final class FrameworkInformationService {
         return FrameworkInformation(name: framework.name,
                                     architectures: architectures(fromOutput: rawArchitectures),
                                     linking: linking(fromOutput: fileOutput))
+    }
+
+    @discardableResult
+    private func updateFile(in folder: Folder, withName name: String, content: String) throws -> Bool {
+        var filelistsWereUpdated = false
+        if folder.containsFile(named: name) {
+            let file = try folder.file(named: name)
+            if let oldContent = try? file.readAsString(), oldContent != content {
+                try shellOut(to: "chmod +w \(file.name)", at: folder.path)
+                try file.write(string: content)
+                filelistsWereUpdated = true
+                print("✅ \(file.name) was successfully updated")
+                try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+            }
+        }
+        else {
+            let file = try folder.createFile(named: name)
+            try file.write(string: content)
+            filelistsWereUpdated = true
+            print("✅ \(file.name) was successfully added")
+            try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+        }
+        return filelistsWereUpdated
     }
 }
 
