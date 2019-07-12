@@ -74,36 +74,15 @@ final class FrameworkInformationService {
                                                        type: .output)
 
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
-                let listFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
-                let parent = carthageFolder.parent ?? projectFolder
-                let path = listFolder.path.replacingOccurrences(of: parent.path, with: "$(SRCROOT)/").deleting(suffix: "/")
-
-                func updateFile(withName name: String, content: String) throws -> String {
-                    if listFolder.containsFile(named: name) {
-                        let file = try listFolder.file(named: name)
-                        if let oldContent = try? file.readAsString(),
-                            oldContent != content {
-                            try file.write(string: content)
-                            filelistsWereUpdated = true
-                            print("✅ \(file.name) was successfully updated")
-                        }
-                    }
-                    else {
-                        let file = try listFolder.createFile(named: name)
-                        try file.write(string: content)
-                        filelistsWereUpdated = true
-                        print("✅ \(file.name) was successfully added")
-                    }
-                    return [path, name].joined(separator: "/")
-                }
+                let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+                let parentFolder = carthageFolder.parent ?? projectFolder
+                let path = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
                 let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListNewContent = inputPaths.joined(separator: "\n")
-                let inputFileListPath = try updateFile(withName: inputFileListFileName, content: inputFileListNewContent)
+                let inputFileListPath = [path, inputFileListFileName].joined(separator: "/")
 
                 let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListNewContent = outputPaths.joined(separator: "\n")
-                let outputFileListPath = try updateFile(withName: outputFileListFileName, content: outputFileListNewContent)
+                let outputFileListPath = [path, outputFileListFileName].joined(separator: "/")
 
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
@@ -111,49 +90,40 @@ final class FrameworkInformationService {
                 if let carthage = carthageScript {
                     var scriptHasBeenUpdated = false
 
+                    if carthage.body.shellScript != Keys.carthageScript {
+                        carthage.body.shellScript = Keys.carthageScript
+                        scriptHasBeenUpdated = true
+                    }
+
                     switch format {
                     case .file:
-                        if carthage.body.inputFileListPaths?.isEmpty == false {
-                            carthage.body.inputFileListPaths?.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.inputPaths != inputPaths {
-                            carthage.body.inputPaths = inputPaths
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.outputFileListPaths?.isEmpty == false {
-                            carthage.body.outputFileListPaths?.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.outputPaths != outputPaths {
-                            carthage.body.outputPaths = outputPaths
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.shellScript != Keys.carthageScript {
-                            carthage.body.shellScript = Keys.carthageScript
-                            scriptHasBeenUpdated = true
-                        }
+                        scriptHasBeenUpdated = carthage.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
-                        if !carthage.body.inputPaths.isEmpty {
-                            carthage.body.inputPaths.removeAll()
-                            scriptHasBeenUpdated = true
+                        func updateFile(withName name: String, content: String) throws {
+                            if listsFolder.containsFile(named: name) {
+                                let file = try listsFolder.file(named: name)
+                                if let oldContent = try? file.readAsString(),
+                                    oldContent != content {
+                                    try file.write(string: content)
+                                    filelistsWereUpdated = true
+                                    print("✅ \(file.name) was successfully updated")
+                                }
+                            }
+                            else {
+                                let file = try listsFolder.createFile(named: name)
+                                try file.write(string: content)
+                                filelistsWereUpdated = true
+                                print("✅ \(file.name) was successfully added")
+                            }
                         }
-                        if carthage.body.inputFileListPaths?.first != inputFileListPath {
-                            carthage.body.inputFileListPaths = [inputFileListPath]
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.outputFileListPaths?.first != outputFileListPath {
-                            carthage.body.outputFileListPaths = [outputFileListPath]
-                            scriptHasBeenUpdated = true
-                        }
-                        if !carthage.body.outputPaths.isEmpty {
-                            carthage.body.outputPaths.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if carthage.body.shellScript != Keys.carthageScript {
-                            carthage.body.shellScript = Keys.carthageScript
-                            scriptHasBeenUpdated = true
-                        }
+
+                        let inputFileListNewContent = inputPaths.joined(separator: "\n")
+                        try updateFile(withName: inputFileListFileName, content: inputFileListNewContent)
+
+                        let outputFileListNewContent = outputPaths.joined(separator: "\n")
+                        try updateFile(withName: outputFileListFileName, content: outputFileListNewContent)
+
+                        scriptHasBeenUpdated = carthage.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
                     }
                     if scriptHasBeenUpdated {
                         needUpdateProject = true
