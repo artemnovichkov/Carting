@@ -107,9 +107,11 @@ public final class FrameworkInformationService {
                                 let file = try listsFolder.file(named: name)
                                 if let oldContent = try? file.readAsString(),
                                     oldContent != content {
+                                    try shellOut(to: "chmod +w \(file.name)", at: listsFolder.path)
                                     try file.write(string: content)
                                     filelistsWereUpdated = true
                                     print("✅ \(file.name) was successfully updated")
+                                    try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
                                 }
                             }
                             else {
@@ -117,6 +119,7 @@ public final class FrameworkInformationService {
                                 try file.write(string: content)
                                 filelistsWereUpdated = true
                                 print("✅ \(file.name) was successfully added")
+                                try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
                             }
                         }
 
