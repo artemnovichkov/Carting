@@ -144,12 +144,6 @@ public final class FrameworkInformationService {
         }
     }
 
-    func frameworksInformation() throws -> [FrameworkInformation] {
-        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
-        let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
-        return try frameworks.map(information)
-    }
-
     public func printFrameworksInformation() throws {
         let informations = try frameworksInformation()
         informations.forEach { information in
@@ -161,6 +155,12 @@ public final class FrameworkInformationService {
     }
 
     // MARK: - Private
+
+    private func frameworksInformation() throws -> [FrameworkInformation] {
+        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
+        let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
+        return try frameworks.map(information)
+    }
 
     private func information(for framework: Folder) throws -> FrameworkInformation {
         let path = framework.path + framework.nameExcludingExtension
@@ -174,13 +174,13 @@ public final class FrameworkInformationService {
 
     @discardableResult
     private func updateFile(in folder: Folder, withName name: String, content: String) throws -> Bool {
-        var filelistsWereUpdated = false
+        var fileWereUpdated = false
         if folder.containsFile(named: name) {
             let file = try folder.file(named: name)
             if let oldContent = try? file.readAsString(), oldContent != content {
                 try shellOut(to: "chmod +w \(file.name)", at: folder.path)
                 try file.write(string: content)
-                filelistsWereUpdated = true
+                fileWereUpdated = true
                 print("✅ \(file.name) was successfully updated")
                 try shellOut(to: "chmod -w \(file.name)", at: folder.path)
             }
@@ -188,19 +188,12 @@ public final class FrameworkInformationService {
         else {
             let file = try folder.createFile(named: name)
             try file.write(string: content)
-            filelistsWereUpdated = true
+            fileWereUpdated = true
             print("✅ \(file.name) was successfully added")
             try shellOut(to: "chmod -w \(file.name)", at: folder.path)
         }
-        return filelistsWereUpdated
+        return fileWereUpdated
     }
-}
-
-func getEnvironmentVar(_ name: String) -> String? {
-    guard let rawValue = getenv(name) else {
-        return nil
-    }
-    return String(utf8String: rawValue)
 }
 
 struct FrameworkInformation {
