@@ -2,8 +2,6 @@
 //  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
-import Foundation
-
 final class ScriptBody: BaseScriptBody {
 
     var inputFileListPaths: [String]?

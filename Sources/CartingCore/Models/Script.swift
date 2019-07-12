@@ -2,8 +2,6 @@
 //  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
-import Foundation
-
 final class Script {
 
     let identifier: String
