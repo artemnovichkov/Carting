@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017 Artem Novichkov. All rights reserved.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
 import SPMUtility
@@ -17,7 +17,7 @@ enum Format: String, ArgumentKind, CaseIterable {
 
     init(argument: String) throws {
         guard let format = Format(rawValue: argument.lowercased()) else {
-            throw ProjectService.Error.projectReadingFailed
+            throw Error.invalid
         }
         self = format
     }

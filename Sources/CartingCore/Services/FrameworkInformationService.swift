@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017 Rosberry. All rights reserved.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
 import Files

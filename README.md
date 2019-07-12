@@ -42,26 +42,16 @@ Since Xcode 10 Run Script build phases support declaring input and output files 
   <img src=".github/error.png" max-width="90%" alt="Project parsing error" />
 </p>
 
-Run `carting help` to see available commands:
+Run `carting --help` to see available commands:
 
 ```bash
-Usage: carting [command] [options]
-  update:
-      Adds a new script with input/output file paths or updates the script named `Carthage`.
-  -s, --script:
-      The name of Carthage script.
-  -t, --target:
-      The name of target.
-  -p, --path:
-      The project directory path.
-  -f, --format:
-      Format of input/output file paths:
-        file - using simple paths
-        list - using xcfilelists
-  info:
-      Prints Carthage frameworks list with linking description.
-  help:
-      Prints this message.
+OVERVIEW: 🚘 Simple tool for updating Carthage script phase
+
+USAGE: Carting <command> <options>
+
+SUBCOMMANDS:
+info                    Prints Carthage frameworks list with linking description.
+update                  Adds a new script with input/output file paths or updates the script named `Carthage`.
 ```
 
 ## Installing

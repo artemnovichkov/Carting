@@ -1,5 +1,5 @@
 //
-//  Copyright © 2017 Artem Novichkov. All rights reserved.
+//  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
 import SPMUtility
@@ -23,14 +23,11 @@ public class UpdateCommand: Command {
                              usage: "The name of Carthage script.")
         path = subparser.add(option: "--path",
                              shortName: "-p",
-                             usage: "The project directory path.")
+                             usage: "The project directory path.",
+                             completion: .filename)
         format = subparser.add(option: "--format",
                                shortName: "-f",
-                               usage: """
-Format of input/output file paths:
-            file - using simple paths
-            list - using xcfilelists
-""",
+                               usage: "Format of input/output file paths: file - using simple paths, list - using xcfilelists",
                                completion: Format.completion)
         targetName = subparser.add(option: "--target",
                                    shortName: "-t",
@@ -47,12 +44,5 @@ Format of input/output file paths:
                                                      path: path,
                                                      format: format,
                                                      targetName: targetName)
-    }
-}
-
-extension ArgumentParser {
-
-    func add<T: ArgumentKind>(option: String, shortName: String? = nil, usage: String? = nil, completion: ShellCompletion? = nil) -> OptionArgument<T> {
-        return add(option: option, shortName: shortName, kind: T.self, usage: usage, completion: completion)
     }
 }
