@@ -8,7 +8,7 @@ import CartingCore
 do {
     let registry = CommandRegistry(usage: "<command> <options>",
                                    overview: "🚘 Simple tool for updating Carthage script phase")
-    registry.register(UpdateCommand.self, InfoCommand.self)
+    registry.register(UpdateCommand.self, LintCommand.self, InfoCommand.self)
     try registry.run()
 }
 catch {
