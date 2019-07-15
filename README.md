@@ -34,7 +34,7 @@ $ carting update -s MyBestScript
 
 If there is no script with the name, Carting will add a new one.
 
-Since Xcode 10 Run Script build phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-separated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
+Since Xcode 10 Run Script Phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-separated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
 
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
 
@@ -50,9 +50,22 @@ OVERVIEW: 🚘 Simple tool for updating Carthage script phase
 USAGE: Carting <command> <options>
 
 SUBCOMMANDS:
-info                    Prints Carthage frameworks list with linking description.
-update                  Adds a new script with input/output file paths or updates the script named `Carthage`.
+  info                    Prints Carthage frameworks list with linking description.
+  lint                    Lint the project for missing paths.
+  update                  Adds a new script with input/output file paths or updates the script named `Carthage`.
 ```
+
+## Linting
+
+Integrate Carting into an Xcode scheme to get errors displayed in the IDE. Just add a new "Run Script Phase" with:
+
+```bash
+/usr/local/bin/carting lint
+```
+
+<p align="center">
+  <img src=".github/phase.png" max-width="90%" alt="Run Script Phase" />
+</p>
 
 ## Installing
 
@@ -86,20 +99,6 @@ let package = Package(
     ]
 )
 ```
-### Marathon
-
-- Install [Marathon](https://github.com/johnsundell/marathon#installing).
-- Add Carting to Marathon using `$ marathon add git@github.com:artemnovichkov/carting.git`. Alternatively, add `git@github.com:artemnovichkov/carting.git` to your `Marathonfile`.
-- Write your script, then run it using `$ marathon run <path-to-your-script>`.
-
-## Todo
- - [x] Add option for adding new script
- - [x] Add support of multiple targets
- - [x] Add check of linked frameworks
- - [x] Unify errors
- - [x] Check correct work with workspaces
- - [ ] Write tests
-
 ## Author
 
 Artem Novichkov, novichkoff93@gmail.com

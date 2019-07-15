@@ -195,17 +195,6 @@ public final class FrameworkInformationService {
                 let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                        type: .output)
 
-                let carthageFolder = try projectFolder.subfolder(named: "Carthage")
-                let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
-                let parentFolder = carthageFolder.parent ?? projectFolder
-                let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
-
-                let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
-
-                let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
-
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
@@ -221,6 +210,17 @@ public final class FrameworkInformationService {
                     projectInputPaths = carthage.body.inputPaths
                     projectOutputPaths = carthage.body.outputPaths
                 case .list:
+                    let carthageFolder = try projectFolder.subfolder(named: "Carthage")
+                    let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+                    let parentFolder = carthageFolder.parent ?? projectFolder
+                    let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+
+                    let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
+                    let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
+
+                    let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
+                    let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
+                    
                     if carthage.body.inputFileListPaths?.contains(inputFileListPath) == false {
                         missingPaths.append(inputFileListPath)
                         break
