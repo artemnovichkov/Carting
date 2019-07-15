@@ -69,7 +69,7 @@ public final class FrameworkInformationService {
                     .filter { information in
                         script.body.files.contains { $0.name == information.name }
                     }
-                    .map { $0.name }
+                    .map(\.name)
 
                 let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                       type: .input)
@@ -79,13 +79,13 @@ public final class FrameworkInformationService {
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                 let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
                 let parentFolder = carthageFolder.parent ?? projectFolder
-                let path = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
                 let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListPath = [path, inputFileListFileName].joined(separator: "/")
+                let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
 
                 let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListPath = [path, outputFileListFileName].joined(separator: "/")
+                let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
 
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
@@ -188,7 +188,7 @@ public final class FrameworkInformationService {
                     .filter { information in
                         script.body.files.contains { $0.name == information.name }
                     }
-                    .map { $0.name }
+                    .map(\.name)
 
                 let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                       type: .input)
@@ -198,13 +198,13 @@ public final class FrameworkInformationService {
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                 let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
                 let parentFolder = carthageFolder.parent ?? projectFolder
-                let path = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
                 let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListPath = [path, inputFileListFileName].joined(separator: "/")
+                let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
 
                 let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListPath = [path, outputFileListFileName].joined(separator: "/")
+                let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
 
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
@@ -222,7 +222,7 @@ public final class FrameworkInformationService {
                     projectOutputPaths = carthage.body.outputPaths
                 case .list:
                     if carthage.body.inputFileListPaths?.contains(inputFileListPath) == false {
-                        print("error: Missing \(inputFileListPath) in \(target.name) target")
+                        missingPaths.append(inputFileListPath)
                         break
                     }
                     if let inputFile = try? listsFolder.file(named: inputFileListFileName) {
@@ -230,17 +230,20 @@ public final class FrameworkInformationService {
                     }
 
                     if carthage.body.outputFileListPaths?.contains(outputFileListPath) == false {
-                        print("error: Missing \(inputFileListPath) in \(target.name) target")
+                        missingPaths.append(inputFileListPath)
                         break
                     }
                     if let outputFile = try? listsFolder.file(named: outputFileListFileName) {
                         projectOutputPaths = try outputFile.readAsString().split(separator: "\n").map(String.init)
                     }
                 }
-                missingPaths.append(contentsOf:inputPaths.filter { projectInputPaths.contains($0) == false })
-                missingPaths.append(contentsOf:outputPaths.filter { projectOutputPaths.contains($0) == false })
+                missingPaths.append(contentsOf: inputPaths.filter { projectInputPaths.contains($0) == false })
+                missingPaths.append(contentsOf: outputPaths.filter { projectOutputPaths.contains($0) == false })
                 for path in missingPaths {
                     print("error: Missing \(path) in \(target.name) target")
+                }
+                if missingPaths.isEmpty == false {
+                    exit(1)
                 }
         }
     }
@@ -318,6 +321,15 @@ extension FrameworkInformationService.Error: CustomStringConvertible {
     var description: String {
         switch self {
         case .targetFilterFailed(let name): return "There is no target with \(name) name."
+        }
+    }
+}
+
+extension Array {
+
+    func map<T>(_ keyPath: KeyPath<Element, T>) -> [T] {
+        return self.map {
+            $0[keyPath: keyPath]
         }
     }
 }
