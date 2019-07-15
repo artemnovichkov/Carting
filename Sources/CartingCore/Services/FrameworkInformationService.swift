@@ -23,10 +23,10 @@ public final class FrameworkInformationService {
         case input, output
     }
 
-    public var projectPath: String?
+    public var projectDirectory: String?
 
     private var projectFolder: Folder {
-        if let path = projectPath, let folder = try? Folder(path: path) {
+        if let path = projectDirectory, let folder = try? Folder(path: path) {
             return folder
         }
         return FileSystem().currentFolder
@@ -38,7 +38,7 @@ public final class FrameworkInformationService {
     }
 
     public func updateScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let xcodeproj = try XcodeProj(pathString: projectPath! + "/VanHaren.xcodeproj")
+        let xcodeproj = try XcodeProj(pathString: projectDirectory! + "/VanHaren.xcodeproj")
 
         var needUpdateProject = false
         var filelistsWereUpdated = false
@@ -175,7 +175,7 @@ public final class FrameworkInformationService {
         }
 
         if needUpdateProject {
-            try xcodeproj.write(pathString: projectPath! + "/VanHaren.xcodeproj", override: true)
+            try xcodeproj.write(pathString: projectDirectory! + "/VanHaren.xcodeproj", override: true)
         }
         else if !filelistsWereUpdated {
             print("🤷‍♂️ Nothing to update.")
@@ -193,7 +193,7 @@ public final class FrameworkInformationService {
     }
 
     public func lintScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let xcodeproj = try XcodeProj(pathString: projectPath! + "/VanHaren.xcodeproj")
+        let xcodeproj = try XcodeProj(pathString: projectDirectory! + "/VanHaren.xcodeproj")
 
         let filteredTargets = xcodeproj.pbxproj.nativeTargets
             .filter { target in
@@ -330,11 +330,7 @@ public final class FrameworkInformationService {
         return fileWereUpdated
     }
 
-    /// - Parameters:
-    ///   - names: names of frameworks with .framework extension, for example, "Alamofire.framework".
-    ///   - type: type of path.
-    /// - Returns: All paths of passed type.
-    func paths(forFrameworkNames names: [String], type: PathType) -> [String] {
+    private func paths(forFrameworkNames names: [String], type: PathType) -> [String] {
         let prefix: String
         switch type {
         case .input:

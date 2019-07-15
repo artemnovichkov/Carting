@@ -41,7 +41,7 @@ final class LintCommand: Command {
         let projectPath = arguments.get(self.projectPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
-        frameworkInformationService.projectPath = projectPath
+        frameworkInformationService.projectDirectory = projectPath
         try frameworkInformationService.lintScript(withName: name,
                                                    format: format,
                                                    targetName: targetName)
