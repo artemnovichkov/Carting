@@ -16,10 +16,10 @@ public final class FrameworkInformationService {
         static let carthageScript = "\"/usr/local/bin/carthage copy-frameworks\""
     }
 
-    public var path: String?
+    public var projectPath: String?
 
     private var projectFolder: Folder {
-        if let path = path, let folder = try? Folder(path: path) {
+        if let path = projectPath, let folder = try? Folder(path: path) {
             return folder
         }
         return FileSystem().currentFolder
@@ -32,8 +32,8 @@ public final class FrameworkInformationService {
     public init() {
     }
 
-    public func updateScript(withName scriptName: String, path: String?, format: Format, targetName: String?) throws {
-        let project = try projectService.project(path)
+    public func updateScript(withName scriptName: String, format: Format, targetName: String?) throws {
+        let project = try projectService.project(projectPath)
 
         var needUpdateProject = false
         var filelistsWereUpdated = false
@@ -69,7 +69,7 @@ public final class FrameworkInformationService {
                     .filter { information in
                         script.body.files.contains { $0.name == information.name }
                     }
-                    .map { $0.name }
+                    .map(\.name)
 
                 let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                                       type: .input)
@@ -79,57 +79,36 @@ public final class FrameworkInformationService {
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                 let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
                 let parentFolder = carthageFolder.parent ?? projectFolder
-                let path = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
 
                 let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListPath = [path, inputFileListFileName].joined(separator: "/")
+                let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
 
                 let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListPath = [path, outputFileListFileName].joined(separator: "/")
+                let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
 
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
-                if let carthage = carthageScript {
+                if let carthageScript = carthageScript {
                     var scriptHasBeenUpdated = false
 
-                    if carthage.body.shellScript != Keys.carthageScript {
-                        carthage.body.shellScript = Keys.carthageScript
+                    if carthageScript.body.shellScript != Keys.carthageScript {
+                        carthageScript.body.shellScript = Keys.carthageScript
                         scriptHasBeenUpdated = true
                     }
 
                     switch format {
                     case .file:
-                        scriptHasBeenUpdated = carthage.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
+                        scriptHasBeenUpdated = carthageScript.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
-                        func updateFile(withName name: String, content: String) throws {
-                            if listsFolder.containsFile(named: name) {
-                                let file = try listsFolder.file(named: name)
-                                if let oldContent = try? file.readAsString(),
-                                    oldContent != content {
-                                    try shellOut(to: "chmod +w \(file.name)", at: listsFolder.path)
-                                    try file.write(string: content)
-                                    filelistsWereUpdated = true
-                                    print("✅ \(file.name) was successfully updated")
-                                    try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
-                                }
-                            }
-                            else {
-                                let file = try listsFolder.createFile(named: name)
-                                try file.write(string: content)
-                                filelistsWereUpdated = true
-                                print("✅ \(file.name) was successfully added")
-                                try shellOut(to: "chmod -w \(file.name)", at: listsFolder.path)
-                            }
-                        }
-
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
-                        try updateFile(withName: inputFileListFileName, content: inputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: inputFileListFileName, content: inputFileListNewContent)
 
                         let outputFileListNewContent = outputPaths.joined(separator: "\n")
-                        try updateFile(withName: outputFileListFileName, content: outputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: outputFileListFileName, content: outputFileListNewContent)
 
-                        scriptHasBeenUpdated = carthage.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
+                        scriptHasBeenUpdated = carthageScript.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
                     }
                     if scriptHasBeenUpdated {
                         needUpdateProject = true
@@ -151,11 +130,7 @@ public final class FrameworkInformationService {
                                           shellScript: Keys.carthageScript)
                     }
 
-                    let identifier = String.randomAlphaNumericString(length: 24)
-                    let script = Script(identifier: identifier, name: scriptName, body: body)
-                    let buildPhase = BuildPhase(identifier: identifier, name: scriptName)
-                    project.scripts.append(script)
-                    target.body.buildPhases.append(buildPhase)
+                    project.addScript(withName: scriptName, body: body, to: target)
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     needUpdateProject = true
                 }
@@ -169,12 +144,6 @@ public final class FrameworkInformationService {
         }
     }
 
-    func frameworksInformation() throws -> [FrameworkInformation] {
-        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
-        let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
-        return try frameworks.map(information)
-    }
-
     public func printFrameworksInformation() throws {
         let informations = try frameworksInformation()
         informations.forEach { information in
@@ -185,7 +154,107 @@ public final class FrameworkInformationService {
         }
     }
 
+    public func lintScript(withName scriptName: String, format: Format, targetName: String?) throws {
+        let project = try projectService.project(projectPath)
+
+        let filteredTargets = project.targets
+            .filter { target in
+                guard target.body.productType.isApplication else {
+                    return false
+                }
+                if let targetName = targetName {
+                    return target.name.lowercased() == targetName.lowercased()
+                }
+                return true
+        }
+
+        if let targetName = targetName, filteredTargets.isEmpty {
+            throw Error.targetFilterFailed(name: targetName)
+        }
+
+        let carthageDynamicFrameworks = try frameworksInformation()
+            .filter { information in
+                information.linking == .dynamic
+        }
+
+        try filteredTargets
+            .forEach { target in
+                let frameworkBuildPhase = target.body.buildPhases.first { $0.name == "Frameworks" }
+                let frameworkScript = project.frameworkScripts.first { $0.identifier == frameworkBuildPhase?.identifier }
+                guard let script = frameworkScript else {
+                    return
+                }
+                let linkedCarthageDynamicFrameworkNames = carthageDynamicFrameworks
+                    .filter { information in
+                        script.body.files.contains { $0.name == information.name }
+                    }
+                    .map(\.name)
+
+                let inputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                      type: .input)
+                let outputPaths = projectService.paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
+                                                       type: .output)
+
+                let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
+                let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
+
+                guard let carthage = carthageScript else {
+                    return
+                }
+
+                var missingPaths = [String]()
+                var projectInputPaths = [String]()
+                var projectOutputPaths = [String]()
+                switch format {
+                case .file:
+                    projectInputPaths = carthage.body.inputPaths
+                    projectOutputPaths = carthage.body.outputPaths
+                case .list:
+                    let carthageFolder = try projectFolder.subfolder(named: "Carthage")
+                    let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+                    let parentFolder = carthageFolder.parent ?? projectFolder
+                    let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+
+                    let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
+                    let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
+
+                    let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
+                    let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
+                    
+                    if carthage.body.inputFileListPaths?.contains(inputFileListPath) == false {
+                        missingPaths.append(inputFileListPath)
+                        break
+                    }
+                    if let inputFile = try? listsFolder.file(named: inputFileListFileName) {
+                        projectInputPaths = try inputFile.readAsString().split(separator: "\n").map(String.init)
+                    }
+
+                    if carthage.body.outputFileListPaths?.contains(outputFileListPath) == false {
+                        missingPaths.append(inputFileListPath)
+                        break
+                    }
+                    if let outputFile = try? listsFolder.file(named: outputFileListFileName) {
+                        projectOutputPaths = try outputFile.readAsString().split(separator: "\n").map(String.init)
+                    }
+                }
+                missingPaths.append(contentsOf: inputPaths.filter { projectInputPaths.contains($0) == false })
+                missingPaths.append(contentsOf: outputPaths.filter { projectOutputPaths.contains($0) == false })
+                for path in missingPaths {
+                    print("error: Missing \(path) in \(target.name) target")
+                }
+                if missingPaths.isEmpty == false {
+                    exit(1)
+                }
+        }
+    }
+
     // MARK: - Private
+
+    private func frameworksInformation() throws -> [FrameworkInformation] {
+        let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
+        let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
+        return try frameworks.map(information)
+    }
 
     private func information(for framework: Folder) throws -> FrameworkInformation {
         let path = framework.path + framework.nameExcludingExtension
@@ -196,13 +265,29 @@ public final class FrameworkInformationService {
                                     architectures: architectures(fromOutput: rawArchitectures),
                                     linking: linking(fromOutput: fileOutput))
     }
-}
 
-func getEnvironmentVar(_ name: String) -> String? {
-    guard let rawValue = getenv(name) else {
-        return nil
+    @discardableResult
+    private func updateFile(in folder: Folder, withName name: String, content: String) throws -> Bool {
+        var fileWereUpdated = false
+        if folder.containsFile(named: name) {
+            let file = try folder.file(named: name)
+            if let oldContent = try? file.readAsString(), oldContent != content {
+                try shellOut(to: "chmod +w \(file.name)", at: folder.path)
+                try file.write(string: content)
+                fileWereUpdated = true
+                print("✅ \(file.name) was successfully updated")
+                try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+            }
+        }
+        else {
+            let file = try folder.createFile(named: name)
+            try file.write(string: content)
+            fileWereUpdated = true
+            print("✅ \(file.name) was successfully added")
+            try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+        }
+        return fileWereUpdated
     }
-    return String(utf8String: rawValue)
 }
 
 struct FrameworkInformation {
@@ -236,6 +321,15 @@ extension FrameworkInformationService.Error: CustomStringConvertible {
     var description: String {
         switch self {
         case .targetFilterFailed(let name): return "There is no target with \(name) name."
+        }
+    }
+}
+
+extension Array {
+
+    func map<T>(_ keyPath: KeyPath<Element, T>) -> [T] {
+        return self.map {
+            $0[keyPath: keyPath]
         }
     }
 }

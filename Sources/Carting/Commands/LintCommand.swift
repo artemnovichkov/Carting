@@ -6,10 +6,10 @@ import SPMUtility
 import CartingCore
 import Foundation
 
-final class UpdateCommand: Command {
+final class LintCommand: Command {
 
-    var command = "update"
-    var overview = "Adds a new script with input/output file paths or updates the script named `Carthage`."
+    var command = "lint"
+    var overview = "Lint the project for missing paths."
 
     private let name: OptionArgument<String>
     private let projectPath: OptionArgument<String>
@@ -24,9 +24,9 @@ final class UpdateCommand: Command {
                              shortName: "-s",
                              usage: "The name of Carthage script.")
         projectPath = subparser.add(option: "--path",
-                             shortName: "-p",
-                             usage: "The project directory path.",
-                             completion: .filename)
+                                    shortName: "-p",
+                                    usage: "The project directory path.",
+                                    completion: .filename)
         format = subparser.add(option: "--format",
                                shortName: "-f",
                                usage: "Format of input/output file paths: file - using simple paths, list - using xcfilelists",
@@ -42,8 +42,8 @@ final class UpdateCommand: Command {
         let format = arguments.get(self.format) ?? .list
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
         frameworkInformationService.projectPath = projectPath
-        try frameworkInformationService.updateScript(withName: name,
-                                                     format: format,
-                                                     targetName: targetName)
+        try frameworkInformationService.lintScript(withName: name,
+                                                   format: format,
+                                                   targetName: targetName)
     }
 }

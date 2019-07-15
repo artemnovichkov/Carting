@@ -30,4 +30,12 @@ final class Project {
         self.scripts = scripts
         self.frameworkScripts = frameworkScripts
     }
+
+    func addScript(withName name: String, body: ScriptBody, to target: Target) {
+        let identifier = String.randomAlphaNumericString(length: 24)
+        let script = Script(identifier: identifier, name: name, body: body)
+        let buildPhase = BuildPhase(identifier: identifier, name: name)
+        scripts.append(script)
+        target.body.buildPhases.append(buildPhase)
+    }
 }
