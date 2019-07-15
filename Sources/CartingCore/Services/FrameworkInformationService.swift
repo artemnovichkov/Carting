@@ -90,17 +90,17 @@ public final class FrameworkInformationService {
                 let carthageBuildPhase = target.body.buildPhases.first { $0.name == scriptName }
                 let carthageScript = project.scripts.first { $0.identifier == carthageBuildPhase?.identifier }
 
-                if let carthage = carthageScript {
+                if let carthageScript = carthageScript {
                     var scriptHasBeenUpdated = false
 
-                    if carthage.body.shellScript != Keys.carthageScript {
-                        carthage.body.shellScript = Keys.carthageScript
+                    if carthageScript.body.shellScript != Keys.carthageScript {
+                        carthageScript.body.shellScript = Keys.carthageScript
                         scriptHasBeenUpdated = true
                     }
 
                     switch format {
                     case .file:
-                        scriptHasBeenUpdated = carthage.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
+                        scriptHasBeenUpdated = carthageScript.updateFiles(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
                         filelistsWereUpdated = try updateFile(in: listsFolder, withName: inputFileListFileName, content: inputFileListNewContent)
@@ -108,7 +108,7 @@ public final class FrameworkInformationService {
                         let outputFileListNewContent = outputPaths.joined(separator: "\n")
                         filelistsWereUpdated = try updateFile(in: listsFolder, withName: outputFileListFileName, content: outputFileListNewContent)
 
-                        scriptHasBeenUpdated = carthage.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
+                        scriptHasBeenUpdated = carthageScript.updateFileLists(inputFileListPath: inputFileListPath, outputFileListPath: outputFileListPath)
                     }
                     if scriptHasBeenUpdated {
                         needUpdateProject = true
