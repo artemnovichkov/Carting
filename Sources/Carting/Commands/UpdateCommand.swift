@@ -4,6 +4,7 @@
 
 import SPMUtility
 import CartingCore
+import Foundation
 
 final class UpdateCommand: Command {
 
@@ -37,9 +38,9 @@ final class UpdateCommand: Command {
 
     func run(with arguments: ArgumentParser.Result) throws {
         let name = arguments.get(self.name) ?? "Carthage"
-        let projectPath = arguments.get(self.projectPath)
+        let projectPath = arguments.get(self.projectPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
-        let targetName = arguments.get(self.targetName)
+        let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
         frameworkInformationService.projectPath = projectPath
         try frameworkInformationService.updateScript(withName: name,
                                                      format: format,

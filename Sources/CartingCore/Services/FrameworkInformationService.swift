@@ -222,23 +222,25 @@ public final class FrameworkInformationService {
                     projectOutputPaths = carthage.body.outputPaths
                 case .list:
                     if carthage.body.inputFileListPaths?.contains(inputFileListPath) == false {
-                        print("error: Missing \(inputFileListPath)")
+                        print("error: Missing \(inputFileListPath) in \(target.name) target")
                         break
                     }
-                    let inputFile = try listsFolder.file(named: inputFileListFileName)
-                    projectInputPaths = try inputFile.readAsString().split(separator: "\n").map(String.init)
+                    if let inputFile = try? listsFolder.file(named: inputFileListFileName) {
+                        projectInputPaths = try inputFile.readAsString().split(separator: "\n").map(String.init)
+                    }
 
                     if carthage.body.outputFileListPaths?.contains(outputFileListPath) == false {
-                        print("error: Missing \(inputFileListPath)")
+                        print("error: Missing \(inputFileListPath) in \(target.name) target")
                         break
                     }
-                    let outputFile = try listsFolder.file(named: outputFileListFileName)
-                    projectOutputPaths = try outputFile.readAsString().split(separator: "\n").map(String.init)
+                    if let outputFile = try? listsFolder.file(named: outputFileListFileName) {
+                        projectOutputPaths = try outputFile.readAsString().split(separator: "\n").map(String.init)
+                    }
                 }
                 missingPaths.append(contentsOf:inputPaths.filter { projectInputPaths.contains($0) == false })
                 missingPaths.append(contentsOf:outputPaths.filter { projectOutputPaths.contains($0) == false })
                 for path in missingPaths {
-                    print("error: Missing \(path)")
+                    print("error: Missing \(path) in \(target.name) target")
                 }
         }
     }
