@@ -220,7 +220,7 @@ public final class FrameworkInformationService {
 
                     let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
                     let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
-                    
+
                     if carthage.body.inputFileListPaths?.contains(inputFileListPath) == false {
                         missingPaths.append(inputFileListPath)
                         break
@@ -272,11 +272,11 @@ public final class FrameworkInformationService {
         if folder.containsFile(named: name) {
             let file = try folder.file(named: name)
             if let oldContent = try? file.readAsString(), oldContent != content {
-                try shellOut(to: "chmod +w \(file.name)", at: folder.path)
+                try shellOut(to: "chmod +w \"\(file.name)\"", at: folder.path)
                 try file.write(string: content)
                 fileWereUpdated = true
                 print("✅ \(file.name) was successfully updated")
-                try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+                try shellOut(to: "chmod -w \"\(file.name)\"", at: folder.path)
             }
         }
         else {
@@ -284,7 +284,7 @@ public final class FrameworkInformationService {
             try file.write(string: content)
             fileWereUpdated = true
             print("✅ \(file.name) was successfully added")
-            try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+            try shellOut(to: "chmod -w \"\(file.name)\"", at: folder.path)
         }
         return fileWereUpdated
     }
