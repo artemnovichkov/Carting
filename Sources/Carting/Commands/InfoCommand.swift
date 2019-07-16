@@ -10,13 +10,13 @@ final class InfoCommand: Command {
     var command = "info"
     var overview = "Prints Carthage frameworks list with linking description."
 
-    private lazy var frameworkInformationService: FrameworkInformationService = .init()
+    private lazy var projectService: ProjectService = .init()
 
     required init(parser: ArgumentParser) {
         parser.add(subparser: command, overview: overview)
     }
 
     func run(with arguments: ArgumentParser.Result) throws {
-        try frameworkInformationService.printFrameworksInformation()
+        try projectService.printFrameworksInformation()
     }
 }

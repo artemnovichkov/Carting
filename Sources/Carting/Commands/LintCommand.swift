@@ -7,17 +7,17 @@ import CartingCore
 import Foundation
 
 final class LintCommand: Command {
-
+    
     var command = "lint"
     var overview = "Lint the project for missing paths."
-
+    
     private let name: OptionArgument<String>
     private let projectPath: OptionArgument<String>
     private let format: OptionArgument<Format>
     private let targetName: OptionArgument<String>
-
-    private lazy var frameworkInformationService: FrameworkInformationService = .init()
-
+    
+    private lazy var projectService: ProjectService = .init()
+    
     required init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
         name = subparser.add(option: "--script",
@@ -35,15 +35,15 @@ final class LintCommand: Command {
                                    shortName: "-t",
                                    usage: "The name of target.")
     }
-
+    
     func run(with arguments: ArgumentParser.Result) throws {
         let name = arguments.get(self.name) ?? "Carthage"
         let projectPath = arguments.get(self.projectPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
-        frameworkInformationService.projectDirectory = projectPath
-        try frameworkInformationService.lintScript(withName: name,
-                                                   format: format,
-                                                   targetName: targetName)
+        projectService.projectDirectory = projectPath
+        try projectService.lintScript(withName: name,
+                                      format: format,
+                                      targetName: targetName)
     }
 }

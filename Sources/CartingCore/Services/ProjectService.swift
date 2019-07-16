@@ -7,13 +7,15 @@ import ShellOut
 import Foundation
 import XcodeProj
 
-public final class FrameworkInformationService {
+public final class ProjectService {
 
     enum Error: Swift.Error {
+        case projectFileReadingFailed
         case targetFilterFailed(name: String)
     }
 
     private enum Keys {
+        static let projectExtension = "xcodeproj"
         static let carthageScript = "/usr/local/bin/carthage copy-frameworks"
         static let inputPath = "$(SRCROOT)/Carthage/Build/iOS/"
         static let outputPath = "$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/"
@@ -38,7 +40,8 @@ public final class FrameworkInformationService {
     }
 
     public func updateScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let xcodeproj = try XcodeProj(pathString: projectDirectory! + "/VanHaren.xcodeproj")
+        let projectPath = try self.projectPath(inDirectory: projectDirectory)
+        let xcodeproj = try XcodeProj(pathString: projectPath)
 
         var needUpdateProject = false
         var filelistsWereUpdated = false
@@ -52,7 +55,7 @@ public final class FrameworkInformationService {
                     return target.name.lowercased() == targetName.lowercased()
                 }
                 return true
-        }
+            }
 
         if let targetName = targetName, filteredTargets.isEmpty {
             throw Error.targetFilterFailed(name: targetName)
@@ -61,23 +64,11 @@ public final class FrameworkInformationService {
         let carthageDynamicFrameworks = try frameworksInformation()
             .filter { information in
                 information.linking == .dynamic
-        }
+            }
 
         try filteredTargets
             .forEach { target in
-                guard let script = try target.frameworksBuildPhase() else {
-                    return
-                }
-                let linkedCarthageDynamicFrameworkNames = carthageDynamicFrameworks
-                    .filter { information in
-                        guard let files = script.files else {
-                            return false
-                        }
-                        return files.contains { file in
-                            file.file?.name == information.name
-                        }
-                    }
-                    .map(\.name)
+                let linkedCarthageDynamicFrameworkNames = target.linkedFrameworks(withNames: carthageDynamicFrameworks.map(\.name))
 
                 let inputPaths = paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                        type: .input)
@@ -108,22 +99,7 @@ public final class FrameworkInformationService {
 
                     switch format {
                     case .file:
-                        if projectBuildPhase.inputFileListPaths?.isEmpty == false {
-                            projectBuildPhase.inputFileListPaths?.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if projectBuildPhase.inputPaths != inputPaths {
-                            projectBuildPhase.inputPaths = inputPaths
-                            scriptHasBeenUpdated = true
-                        }
-                        if projectBuildPhase.outputFileListPaths?.isEmpty == false {
-                            projectBuildPhase.outputFileListPaths?.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if projectBuildPhase.outputPaths != outputPaths {
-                            projectBuildPhase.outputPaths = outputPaths
-                            scriptHasBeenUpdated = true
-                        }
+                        scriptHasBeenUpdated = projectBuildPhase.update(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
                         filelistsWereUpdated = try updateFile(in: listsFolder, withName: inputFileListFileName, content: inputFileListNewContent)
@@ -131,22 +107,8 @@ public final class FrameworkInformationService {
                         let outputFileListNewContent = outputPaths.joined(separator: "\n")
                         filelistsWereUpdated = try updateFile(in: listsFolder, withName: outputFileListFileName, content: outputFileListNewContent)
 
-                        if !projectBuildPhase.inputPaths.isEmpty {
-                            projectBuildPhase.inputPaths.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
-                        if projectBuildPhase.inputFileListPaths?.first != inputFileListPath {
-                            projectBuildPhase.inputFileListPaths = [inputFileListPath]
-                            scriptHasBeenUpdated = true
-                        }
-                        if projectBuildPhase.outputFileListPaths?.first != outputFileListPath {
-                            projectBuildPhase.outputFileListPaths = [outputFileListPath]
-                            scriptHasBeenUpdated = true
-                        }
-                        if !projectBuildPhase.outputPaths.isEmpty {
-                            projectBuildPhase.outputPaths.removeAll()
-                            scriptHasBeenUpdated = true
-                        }
+                        scriptHasBeenUpdated = projectBuildPhase.update(inputFileListPath: inputFileListPath,
+                                                                        outputFileListPath: outputFileListPath)
                     }
                     if scriptHasBeenUpdated {
                         needUpdateProject = true
@@ -169,6 +131,7 @@ public final class FrameworkInformationService {
                     }
 
                     target.buildPhases.append(buildPhase)
+                    xcodeproj.pbxproj.add(object: buildPhase)
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     needUpdateProject = true
                 }
@@ -193,7 +156,8 @@ public final class FrameworkInformationService {
     }
 
     public func lintScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let xcodeproj = try XcodeProj(pathString: projectDirectory! + "/VanHaren.xcodeproj")
+        let projectPath = try self.projectPath(inDirectory: projectDirectory)
+        let xcodeproj = try XcodeProj(pathString: projectPath)
 
         let filteredTargets = xcodeproj.pbxproj.nativeTargets
             .filter { target in
@@ -204,7 +168,7 @@ public final class FrameworkInformationService {
                     return target.name.lowercased() == targetName.lowercased()
                 }
                 return true
-        }
+            }
 
         if let targetName = targetName, filteredTargets.isEmpty {
             throw Error.targetFilterFailed(name: targetName)
@@ -213,23 +177,11 @@ public final class FrameworkInformationService {
         let carthageDynamicFrameworks = try frameworksInformation()
             .filter { information in
                 information.linking == .dynamic
-        }
+            }
 
         try filteredTargets
             .forEach { target in
-                guard let script = try target.frameworksBuildPhase() else {
-                    return
-                }
-                let linkedCarthageDynamicFrameworkNames = carthageDynamicFrameworks
-                    .filter { information in
-                        guard let files = script.files else {
-                            return false
-                        }
-                        return files.contains { file in
-                            file.file?.name == information.name
-                        }
-                    }
-                    .map(\.name)
+                let linkedCarthageDynamicFrameworkNames = target.linkedFrameworks(withNames: carthageDynamicFrameworks.map(\.name))
 
                 let inputPaths = paths(forFrameworkNames: linkedCarthageDynamicFrameworkNames,
                                        type: .input)
@@ -291,20 +243,32 @@ public final class FrameworkInformationService {
 
     // MARK: - Private
 
-    private func frameworksInformation() throws -> [FrameworkInformation] {
+    private func projectPath(inDirectory directory: String?) throws -> String {
+        guard let path = directory else {
+            throw Error.projectFileReadingFailed
+        }
+        let folder = try Folder(path: path)
+        let file = folder.subfolders.first { $0.name.hasSuffix(Keys.projectExtension) }
+        guard let projectFile = file else {
+            throw Error.projectFileReadingFailed
+        }
+        return projectFile.path
+    }
+
+    private func frameworksInformation() throws -> [Framework] {
         let frameworkFolder = try projectFolder.subfolder(atPath: "Carthage/Build/iOS")
         let frameworks = frameworkFolder.subfolders.filter { $0.name.hasSuffix("framework") }
         return try frameworks.map(information)
     }
 
-    private func information(for framework: Folder) throws -> FrameworkInformation {
+    private func information(for framework: Folder) throws -> Framework {
         let path = framework.path + framework.nameExcludingExtension
         let fileOutput = try shellOut(to: "file", arguments: [path.quotify])
         let lipoOutput = try shellOut(to: "lipo", arguments: ["-info", path.quotify])
         let rawArchitectures = lipoOutput.components(separatedBy: ": ").last!
-        return FrameworkInformation(name: framework.name,
-                                    architectures: architectures(fromOutput: rawArchitectures),
-                                    linking: linking(fromOutput: fileOutput))
+        return Framework(name: framework.name,
+                         architectures: architectures(fromOutput: rawArchitectures),
+                         linking: linking(fromOutput: fileOutput))
     }
 
     @discardableResult
@@ -344,46 +308,87 @@ public final class FrameworkInformationService {
     }
 }
 
-struct FrameworkInformation {
-
-    enum Architecture: String {
-        case i386, x86_64, armv7, arm64 //swiftlint:disable:this identifier_name
-    }
-
-    enum Linking: String {
-        case `static`, dynamic
-    }
-
-    let name: String
-    let architectures: [Architecture]
-    let linking: Linking
-}
-
-func linking(fromOutput output: String) -> FrameworkInformation.Linking {
+func linking(fromOutput output: String) -> Framework.Linking {
     if output.contains("current ar archive") {
         return .static
     }
     return .dynamic
 }
 
-func architectures(fromOutput output: String) -> [FrameworkInformation.Architecture] {
-    return output.components(separatedBy: " ").compactMap(FrameworkInformation.Architecture.init)
+func architectures(fromOutput output: String) -> [Framework.Architecture] {
+    return output.components(separatedBy: " ").compactMap(Framework.Architecture.init)
 }
 
-extension FrameworkInformationService.Error: CustomStringConvertible {
+extension ProjectService.Error: CustomStringConvertible {
 
     var description: String {
         switch self {
+        case .projectFileReadingFailed: return "Can't find project file."
         case .targetFilterFailed(let name): return "There is no target with \(name) name."
         }
     }
 }
 
-extension Array {
+extension PBXNativeTarget {
 
-    func map<T>(_ keyPath: KeyPath<Element, T>) -> [T] {
-        return self.map {
-            $0[keyPath: keyPath]
+    func linkedFrameworks(withNames names: [String]) -> [String] {
+        guard let frameworksBuildPhase = try? frameworksBuildPhase() else {
+            return []
         }
+        return names.filter { name in
+            guard let files = frameworksBuildPhase.files else {
+                return false
+            }
+            return files.contains { file in
+                file.file?.name == name
+            }
+        }
+    }
+}
+
+extension PBXShellScriptBuildPhase {
+
+    @discardableResult
+    func update(inputPaths: [String], outputPaths: [String]) -> Bool {
+        var scriptHasBeenUpdated = false
+        if inputFileListPaths?.isEmpty == false {
+            inputFileListPaths?.removeAll()
+            scriptHasBeenUpdated = true
+        }
+        if self.inputPaths != inputPaths {
+            self.inputPaths = inputPaths
+            scriptHasBeenUpdated = true
+        }
+        if outputFileListPaths?.isEmpty == false {
+            outputFileListPaths?.removeAll()
+            scriptHasBeenUpdated = true
+        }
+        if self.outputPaths != outputPaths {
+            self.outputPaths = outputPaths
+            scriptHasBeenUpdated = true
+        }
+        return scriptHasBeenUpdated
+    }
+
+    @discardableResult
+    func update(inputFileListPath: String, outputFileListPath: String) -> Bool {
+        var scriptHasBeenUpdated = false
+        if !inputPaths.isEmpty {
+            inputPaths.removeAll()
+            scriptHasBeenUpdated = true
+        }
+        if inputFileListPaths?.first != inputFileListPath {
+            inputFileListPaths = [inputFileListPath]
+            scriptHasBeenUpdated = true
+        }
+        if outputFileListPaths?.first != outputFileListPath {
+            outputFileListPaths = [outputFileListPath]
+            scriptHasBeenUpdated = true
+        }
+        if !outputPaths.isEmpty {
+            outputPaths.removeAll()
+            scriptHasBeenUpdated = true
+        }
+        return scriptHasBeenUpdated
     }
 }
