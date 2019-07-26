@@ -12,18 +12,16 @@ final class LintCommand: Command {
     var overview = "Lint the project for missing paths."
 
     private let name: OptionArgument<String>
-    private let projectPath: OptionArgument<String>
+    private let projectDirectoryPath: OptionArgument<String>
     private let format: OptionArgument<Format>
     private let targetName: OptionArgument<String>
-
-    private lazy var projectService: ProjectService = .init()
 
     required init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
         name = subparser.add(option: "--script",
                              shortName: "-s",
                              usage: "The name of Carthage script.")
-        projectPath = subparser.add(option: "--path",
+        projectDirectoryPath = subparser.add(option: "--path",
                                     shortName: "-p",
                                     usage: "The project directory path.",
                                     completion: .filename)
@@ -38,10 +36,10 @@ final class LintCommand: Command {
 
     func run(with arguments: ArgumentParser.Result) throws {
         let name = arguments.get(self.name) ?? "Carthage"
-        let projectPath = arguments.get(self.projectPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
+        let projectDirectoryPath = arguments.get(self.projectDirectoryPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
-        projectService.projectDirectory = projectPath
+        let projectService = try ProjectService(projectDirectoryPath: projectDirectoryPath)
         try projectService.lintScript(withName: name,
                                       format: format,
                                       targetName: targetName)

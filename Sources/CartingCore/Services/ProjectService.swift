@@ -19,10 +19,10 @@ public final class ProjectService {
         static let carthageScript = "/usr/local/bin/carthage copy-frameworks"
     }
 
-    public var projectDirectory: String?
+    public let projectDirectoryPath: String
 
     private var projectFolder: Folder {
-        if let path = projectDirectory, let folder = try? Folder(path: path) {
+        if let folder = try? Folder(path: projectDirectoryPath) {
             return folder
         }
         return FileSystem().currentFolder
@@ -30,11 +30,15 @@ public final class ProjectService {
 
     // MARK: - Lifecycle
 
-    public init() {
+    public init(projectDirectoryPath: String?) throws {
+        guard let projectDirectoryPath = projectDirectoryPath else {
+            throw Error.projectFileReadingFailed
+        }
+        self.projectDirectoryPath = projectDirectoryPath
     }
 
     public func updateScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let projectPath = try self.projectPath(inDirectory: projectDirectory)
+        let projectPath = try self.projectPath(inDirectory: projectDirectoryPath)
         let xcodeproj = try XcodeProj(pathString: projectPath)
 
         var needUpdateProject = false
@@ -46,10 +50,8 @@ public final class ProjectService {
 
         try filteredTargets
             .forEach { target in
-                let linkedCarthageDynamicFrameworkNames = target.linkedFrameworks(withNames: carthageDynamicFrameworks.map(\.name))
-
-                let inputPaths = target.paths(for: linkedCarthageDynamicFrameworkNames, type: .input)
-                let outputPaths = target.paths(for: linkedCarthageDynamicFrameworkNames, type: .output)
+                let inputPaths = target.paths(for: carthageDynamicFrameworks, type: .input)
+                let outputPaths = target.paths(for: carthageDynamicFrameworks, type: .output)
 
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                 let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
@@ -121,7 +123,7 @@ public final class ProjectService {
 
         if needUpdateProject {
             // TODO: update project name
-            try xcodeproj.write(pathString: projectDirectory! + "/VanHaren.xcodeproj", override: true)
+            try xcodeproj.write(pathString: projectDirectoryPath + "/VanHaren.xcodeproj", override: true)
         }
         else if !filelistsWereUpdated {
             print("🤷‍♂️ Nothing to update.")
@@ -133,13 +135,13 @@ public final class ProjectService {
         informations.forEach { information in
             let description = [information.name, information.linking.rawValue].joined(separator: "\t\t") +
                 "\t" +
-                information.architectures.map { $0.rawValue }.joined(separator: ", ")
+                information.architectures.map(\.rawValue).joined(separator: ", ")
             print(description)
         }
     }
 
     public func lintScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let projectPath = try self.projectPath(inDirectory: projectDirectory)
+        let projectPath = try self.projectPath(inDirectory: projectDirectoryPath)
         let xcodeproj = try XcodeProj(pathString: projectPath)
 
         let filteredTargets = try targets(in: xcodeproj, withName: targetName)
@@ -148,10 +150,9 @@ public final class ProjectService {
 
         try filteredTargets
             .forEach { target in
-                let linkedCarthageDynamicFrameworkNames = target.linkedFrameworks(withNames: carthageDynamicFrameworks.map(\.name))
 
-                let inputPaths = target.paths(for: linkedCarthageDynamicFrameworkNames, type: .input)
-                let outputPaths = target.paths(for: linkedCarthageDynamicFrameworkNames, type: .output)
+                let inputPaths = target.paths(for: carthageDynamicFrameworks, type: .input)
+                let outputPaths = target.paths(for: carthageDynamicFrameworks, type: .output)
 
                 let targetBuildPhase = target.buildPhases.first { $0.name() == scriptName }
                 let buildPhase = xcodeproj.pbxproj.shellScriptBuildPhases.first { $0.uuid == targetBuildPhase?.uuid }
@@ -222,6 +223,9 @@ public final class ProjectService {
 
     private func projectPath(inDirectory directory: String?) throws -> String {
         guard let path = directory else {
+            if let path = ProcessInfo.processInfo.environment["PROJECT_FILE_PATH"] {
+                return path
+            }
             throw Error.projectFileReadingFailed
         }
         let folder = try Folder(path: path)
