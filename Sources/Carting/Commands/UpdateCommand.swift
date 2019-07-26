@@ -7,17 +7,17 @@ import CartingCore
 import Foundation
 
 final class UpdateCommand: Command {
-    
+
     var command = "update"
     var overview = "Adds a new script with input/output file paths or updates the script named `Carthage`."
-    
+
     private let name: OptionArgument<String>
     private let projectPath: OptionArgument<String>
     private let format: OptionArgument<Format>
     private let targetName: OptionArgument<String>
-    
+
     private lazy var projectService: ProjectService = .init()
-    
+
     required init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
         name = subparser.add(option: "--script",
@@ -35,7 +35,7 @@ final class UpdateCommand: Command {
                                    shortName: "-t",
                                    usage: "The name of target.")
     }
-    
+
     func run(with arguments: ArgumentParser.Result) throws {
         let name = arguments.get(self.name) ?? "Carthage"
         let projectPath = arguments.get(self.projectPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]

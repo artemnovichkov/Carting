@@ -78,7 +78,9 @@ public final class ProjectService {
                 let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                 let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
                 let parentFolder = carthageFolder.parent ?? projectFolder
-                let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                let xcfilelistsFolderPath = listsFolder.path
+                    .replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/")
+                    .deleting(suffix: "/")
 
                 let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
                 let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
@@ -102,10 +104,14 @@ public final class ProjectService {
                         scriptHasBeenUpdated = projectBuildPhase.update(inputPaths: inputPaths, outputPaths: outputPaths)
                     case .list:
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
-                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: inputFileListFileName, content: inputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder,
+                                                              withName: inputFileListFileName,
+                                                              content: inputFileListNewContent)
 
                         let outputFileListNewContent = outputPaths.joined(separator: "\n")
-                        filelistsWereUpdated = try updateFile(in: listsFolder, withName: outputFileListFileName, content: outputFileListNewContent)
+                        filelistsWereUpdated = try updateFile(in: listsFolder,
+                                                              withName: outputFileListFileName,
+                                                              content: outputFileListNewContent)
 
                         scriptHasBeenUpdated = projectBuildPhase.update(inputFileListPath: inputFileListPath,
                                                                         outputFileListPath: outputFileListPath)
@@ -135,7 +141,7 @@ public final class ProjectService {
                     print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
                     needUpdateProject = true
                 }
-        }
+            }
 
         if needUpdateProject {
             try xcodeproj.write(pathString: projectDirectory! + "/VanHaren.xcodeproj", override: true)
@@ -206,14 +212,16 @@ public final class ProjectService {
                     let carthageFolder = try projectFolder.subfolder(named: "Carthage")
                     let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
                     let parentFolder = carthageFolder.parent ?? projectFolder
-                    let xcfilelistsFolderPath = listsFolder.path.replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/").deleting(suffix: "/")
+                    let xcfilelistsFolderPath = listsFolder.path
+                        .replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/")
+                        .deleting(suffix: "/")
 
                     let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
                     let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
 
                     let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
                     let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
-                    
+
                     if projectBuildPhase.inputFileListPaths?.contains(inputFileListPath) == false {
                         missingPaths.append(inputFileListPath)
                         break
@@ -238,7 +246,7 @@ public final class ProjectService {
                 if missingPaths.isEmpty == false {
                     exit(1)
                 }
-        }
+            }
     }
 
     // MARK: - Private

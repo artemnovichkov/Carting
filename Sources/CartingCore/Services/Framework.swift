@@ -2,7 +2,6 @@
 //  Copyright © 2019 Artem Novichkov. All rights reserved.
 //
 
-
 struct Framework {
 
     enum Architecture: String {
