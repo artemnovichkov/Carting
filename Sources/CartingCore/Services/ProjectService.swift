@@ -285,11 +285,11 @@ public final class ProjectService {
         if folder.containsFile(named: name) {
             let file = try folder.file(named: name)
             if let oldContent = try? file.readAsString(), oldContent != content {
-                try shellOut(to: "chmod +w \(file.name)", at: folder.path)
+                try shellOut(to: "chmod +w \"\(file.name)\"", at: folder.path)
                 try file.write(string: content)
                 fileWereUpdated = true
                 print("✅ \(file.name) was successfully updated")
-                try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+                try shellOut(to: "chmod -w \"\(file.name)\"", at: folder.path)
             }
         }
         else {
@@ -297,7 +297,7 @@ public final class ProjectService {
             try file.write(string: content)
             fileWereUpdated = true
             print("✅ \(file.name) was successfully added")
-            try shellOut(to: "chmod -w \(file.name)", at: folder.path)
+            try shellOut(to: "chmod -w \"\(file.name)\"", at: folder.path)
         }
         return fileWereUpdated
     }
