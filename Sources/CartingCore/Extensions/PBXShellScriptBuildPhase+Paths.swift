@@ -7,6 +7,15 @@ import XcodeProj
 extension PBXShellScriptBuildPhase {
 
     @discardableResult
+    func update(shellScript: String) -> Bool {
+        if self.shellScript != shellScript {
+            self.shellScript = shellScript
+            return true
+        }
+        return false
+    }
+
+    @discardableResult
     func update(inputPaths: [String], outputPaths: [String]) -> Bool {
         var scriptHasBeenUpdated = false
         if inputFileListPaths?.isEmpty == false {

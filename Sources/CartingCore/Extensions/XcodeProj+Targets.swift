@@ -16,6 +16,6 @@ extension XcodeProj {
                     return target.name.lowercased() == name.lowercased()
                 }
                 return true
-        }
+            }
     }
 }

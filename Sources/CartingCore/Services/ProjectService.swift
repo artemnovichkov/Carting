@@ -47,40 +47,49 @@ public final class ProjectService {
         let filteredTargets = try targets(in: xcodeproj, withName: targetName)
 
         let carthageDynamicFrameworks = try dynamicFrameworksInformation()
+        let carthageFolder = try projectFolder.subfolder(named: "Carthage")
 
         try filteredTargets
             .forEach { target in
                 let inputPaths = target.paths(for: carthageDynamicFrameworks, type: .input)
                 let outputPaths = target.paths(for: carthageDynamicFrameworks, type: .output)
 
-                let carthageFolder = try projectFolder.subfolder(named: "Carthage")
-                let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
-                let parentFolder = carthageFolder.parent ?? projectFolder
-                let xcfilelistsFolderPath = listsFolder.path
-                    .replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/")
-                    .deleting(suffix: "/")
-
-                let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
-                let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
-
-                let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
-                let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
-
                 let targetBuildPhase = target.buildPhases.first { $0.name() == scriptName }
                 let projectBuildPhase = xcodeproj.pbxproj.shellScriptBuildPhases.first { $0.uuid == targetBuildPhase?.uuid }
 
-                if let projectBuildPhase = projectBuildPhase {
-                    var scriptHasBeenUpdated = false
+                var scriptHasBeenUpdated = false
+                switch format {
+                case .file:
+                    if let projectBuildPhase = projectBuildPhase {
+                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Keys.carthageScript)
+                        scriptHasBeenUpdated = projectBuildPhase.update(inputPaths: inputPaths, outputPaths: outputPaths)
+                    }
+                    else {
+                        let buildPhase = PBXShellScriptBuildPhase(name: scriptName,
+                                                                  inputPaths: outputPaths,
+                                                                  outputPaths: outputPaths,
+                                                                  shellScript: Keys.carthageScript)
 
-                    if projectBuildPhase.shellScript != Keys.carthageScript {
-                        projectBuildPhase.shellScript = Keys.carthageScript
+                        target.buildPhases.append(buildPhase)
+                        xcodeproj.pbxproj.add(object: buildPhase)
                         scriptHasBeenUpdated = true
                     }
+                case .list:
+                    let listsFolder = try carthageFolder.createSubfolderIfNeeded(withName: "xcfilelists")
+                    let parentFolder = carthageFolder.parent ?? projectFolder
+                    let xcfilelistsFolderPath = listsFolder.path
+                        .replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/")
+                        .deleting(suffix: "/")
 
-                    switch format {
-                    case .file:
-                        scriptHasBeenUpdated = projectBuildPhase.update(inputPaths: inputPaths, outputPaths: outputPaths)
-                    case .list:
+                    let inputFileListFileName = fileListName(forTargetName: target.name, type: .input)
+                    let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
+
+                    let outputFileListFileName = fileListName(forTargetName: target.name, type: .output)
+                    let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
+
+                    if let projectBuildPhase = projectBuildPhase {
+                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Keys.carthageScript)
+
                         let inputFileListNewContent = inputPaths.joined(separator: "\n")
                         filelistsWereUpdated = try updateFile(in: listsFolder,
                                                               withName: inputFileListFileName,
@@ -94,36 +103,25 @@ public final class ProjectService {
                         scriptHasBeenUpdated = projectBuildPhase.update(inputFileListPath: inputFileListPath,
                                                                         outputFileListPath: outputFileListPath)
                     }
-                    if scriptHasBeenUpdated {
-                        needUpdateProject = true
-                        print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
+                    else {
+                        let buildPhase = PBXShellScriptBuildPhase(name: scriptName,
+                                                                  inputFileListPaths: [inputFileListPath],
+                                                                  outputFileListPaths: [outputFileListPath],
+                                                                  shellScript: Keys.carthageScript)
+
+                        target.buildPhases.append(buildPhase)
+                        xcodeproj.pbxproj.add(object: buildPhase)
+                        scriptHasBeenUpdated = true
                     }
                 }
-                else {
-                    let buildPhase: PBXShellScriptBuildPhase
-                    switch format {
-                    case .file:
-                        buildPhase = PBXShellScriptBuildPhase(name: scriptName,
-                                                              inputPaths: outputPaths,
-                                                              outputPaths: outputPaths,
-                                                              shellScript: Keys.carthageScript)
-                    case .list:
-                        buildPhase = PBXShellScriptBuildPhase(name: scriptName,
-                                                              inputFileListPaths: [inputFileListPath],
-                                                              outputFileListPaths: [outputFileListPath],
-                                                              shellScript: Keys.carthageScript)
-                    }
-
-                    target.buildPhases.append(buildPhase)
-                    xcodeproj.pbxproj.add(object: buildPhase)
-                    print("✅ Script \(scriptName) was successfully added to \(target.name) target.")
+                if scriptHasBeenUpdated {
                     needUpdateProject = true
+                    print("✅ Script \(scriptName) in target \(target.name) was successfully updated.")
                 }
             }
 
         if needUpdateProject {
-            // TODO: update project name
-            try xcodeproj.write(pathString: projectDirectoryPath + "/VanHaren.xcodeproj", override: true)
+            try xcodeproj.write(pathString: projectPath, override: true)
         }
         else if !filelistsWereUpdated {
             print("🤷‍♂️ Nothing to update.")
@@ -176,10 +174,10 @@ public final class ProjectService {
                         .replacingOccurrences(of: parentFolder.path, with: "$(SRCROOT)/")
                         .deleting(suffix: "/")
 
-                    let inputFileListFileName = "\(target.name)-inputPaths.xcfilelist"
+                    let inputFileListFileName = fileListName(forTargetName: target.name, type: .input)
                     let inputFileListPath = [xcfilelistsFolderPath, inputFileListFileName].joined(separator: "/")
 
-                    let outputFileListFileName = "\(target.name)-outputPaths.xcfilelist"
+                    let outputFileListFileName = fileListName(forTargetName: target.name, type: .output)
                     let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
 
                     if projectBuildPhase.inputFileListPaths?.contains(inputFileListPath) == false {
@@ -203,13 +201,19 @@ public final class ProjectService {
                 for path in missingPaths {
                     print("error: Missing \(path) in \(target.name) target")
                 }
-                if missingPaths.isEmpty == false {
-                    exit(1)
-                }
             }
     }
 
     // MARK: - Private
+
+    private func fileListName(forTargetName targetName: String, type: PathType) -> String {
+        switch type {
+        case .input:
+            return targetName + "-inputPaths.xcfilelist"
+        case .output:
+            return targetName + "-outputPaths.xcfilelist"
+        }
+    }
 
     private func targets(in project: XcodeProj, withName name: String?) throws -> [PBXNativeTarget] {
         let filteredTargets = project.targets(with: .application, name: name)
