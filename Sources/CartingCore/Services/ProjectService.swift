@@ -223,13 +223,17 @@ public final class ProjectService {
     }
 
     private func projectPath(inDirectory directory: String?) throws -> String {
-        guard let path = directory else {
-            if let path = ProcessInfo.processInfo.environment["PROJECT_FILE_PATH"] {
-                return path
-            }
-            throw Error.projectFileReadingFailed
+        let directoryPath: String
+        if let directory = directory {
+            directoryPath = directory
         }
-        let folder = try Folder(path: path)
+        else if let envPath = ProcessInfo.processInfo.environment["PROJECT_FILE_PATH"] {
+            directoryPath = envPath
+        }
+        else {
+            directoryPath = FileManager.default.currentDirectoryPath
+        }
+        let folder = try Folder(path: directoryPath)
         let file = folder.subfolders.first { $0.name.hasSuffix(Keys.projectExtension) }
         guard let projectFile = file else {
             throw Error.projectFileReadingFailed
