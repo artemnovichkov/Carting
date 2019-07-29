@@ -4,19 +4,26 @@
 
 import SPMUtility
 import CartingCore
+import Foundation
 
 final class InfoCommand: Command {
 
     var command = "info"
     var overview = "Prints Carthage frameworks list with linking description."
 
-    private lazy var frameworkInformationService: FrameworkInformationService = .init()
+    private let projectDirectoryPath: OptionArgument<String>
 
     required init(parser: ArgumentParser) {
-        parser.add(subparser: command, overview: overview)
+        let subparser = parser.add(subparser: command, overview: overview)
+        projectDirectoryPath = subparser.add(option: "--path",
+                                    shortName: "-p",
+                                    usage: "The project directory path.",
+                                    completion: .filename)
     }
 
     func run(with arguments: ArgumentParser.Result) throws {
-        try frameworkInformationService.printFrameworksInformation()
+        let projectDirectoryPath = arguments.get(self.projectDirectoryPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
+        let projectService = try ProjectService(projectDirectoryPath: projectDirectoryPath)
+        try projectService.printFrameworksInformation()
     }
 }
