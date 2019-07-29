@@ -19,10 +19,10 @@ public final class ProjectService {
         static let carthageScript = "/usr/local/bin/carthage copy-frameworks"
     }
 
-    public let projectDirectoryPath: String
+    public let projectDirectoryPath: String?
 
     private var projectFolder: Folder {
-        if let folder = try? Folder(path: projectDirectoryPath) {
+        if let path = projectDirectoryPath, let folder = try? Folder(path: path) {
             return folder
         }
         return FileSystem().currentFolder
@@ -31,9 +31,6 @@ public final class ProjectService {
     // MARK: - Lifecycle
 
     public init(projectDirectoryPath: String?) throws {
-        guard let projectDirectoryPath = projectDirectoryPath else {
-            throw Error.projectFileReadingFailed
-        }
         self.projectDirectoryPath = projectDirectoryPath
     }
 
