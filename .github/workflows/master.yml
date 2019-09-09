@@ -2,7 +2,7 @@ on:
   push:
     branches:    
       - master
-name: Build and lint
+name: Build
 jobs:
   test:
     name: Build and lint

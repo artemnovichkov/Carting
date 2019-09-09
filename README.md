@@ -5,7 +5,7 @@
 
 <p align="center">
 	<a href="https://github.com/artemnovichkov/carting/actions">
-        <img src="https://github.com/artemnovichkov/carting/workflows/master/badge.svg" />
+        <img src="https://github.com/artemnovichkov/carting/workflows/Build/badge.svg" />
     <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
     <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
