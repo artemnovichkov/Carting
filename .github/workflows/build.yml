@@ -10,4 +10,5 @@ jobs:
       - name: Build
         run: |
           swift build
+          brew install swiftlint
           swiftlint
