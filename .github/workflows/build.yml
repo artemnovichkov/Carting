@@ -1,0 +1,14 @@
+on: pull_request
+name: Build and lint
+jobs:
+  test:
+    name: Build and lint
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build
+        run: |
+          swift build
+          brew install swiftlint
+          swiftlint
