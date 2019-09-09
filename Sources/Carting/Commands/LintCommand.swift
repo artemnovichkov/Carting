@@ -15,6 +15,7 @@ final class LintCommand: Command {
     private let projectDirectoryPath: OptionArgument<String>
     private let format: OptionArgument<Format>
     private let targetName: OptionArgument<String>
+    private let projectNames: OptionArgument<[String]>
 
     required init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
@@ -32,16 +33,21 @@ final class LintCommand: Command {
         targetName = subparser.add(option: "--target",
                                    shortName: "-t",
                                    usage: "The name of target.")
+        projectNames = subparser.add(option: "--project-names",
+                                     shortName: "-n",
+                                     usage: "The names of projects.")
     }
 
     func run(with arguments: ArgumentParser.Result) throws {
         let name = arguments.get(self.name) ?? "Carthage"
         let projectDirectoryPath = arguments.get(self.projectDirectoryPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
+        let projectNames = arguments.get(self.projectNames) ?? []
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
         let projectService = try ProjectService(projectDirectoryPath: projectDirectoryPath)
         try projectService.lintScript(withName: name,
                                       format: format,
-                                      targetName: targetName)
+                                      targetName: targetName,
+                                      projectNames: projectNames)
     }
 }

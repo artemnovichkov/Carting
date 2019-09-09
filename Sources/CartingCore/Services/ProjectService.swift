@@ -34,8 +34,18 @@ public final class ProjectService {
         self.projectDirectoryPath = projectDirectoryPath
     }
 
-    public func updateScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let projectPath = try self.projectPath(inDirectory: projectDirectoryPath)
+    public func updateScript(withName scriptName: String, format: Format, targetName: String?, projectNames: [String]) throws {
+        let projectPaths = try self.projectPaths(inDirectory: projectDirectoryPath, filterNames: projectNames)
+        guard projectPaths.count > 0 else {
+            print("🤷‍♂️ Nothing to update.")
+            return
+        }
+        for path in projectPaths {
+            try updateScript(withName: scriptName, format: format, targetName: targetName, projectPath: path)
+        }
+    }
+
+    public func updateScript(withName scriptName: String, format: Format, targetName: String?, projectPath: String) throws {
         let xcodeproj = try XcodeProj(pathString: projectPath)
 
         var needUpdateProject = false
@@ -134,8 +144,18 @@ public final class ProjectService {
         }
     }
 
-    public func lintScript(withName scriptName: String, format: Format, targetName: String?) throws {
-        let projectPath = try self.projectPath(inDirectory: projectDirectoryPath)
+    public func lintScript(withName scriptName: String, format: Format, targetName: String?, projectNames: [String]) throws {
+        let projectPaths = try self.projectPaths(inDirectory: projectDirectoryPath, filterNames: projectNames)
+        guard projectPaths.count > 0 else {
+            print("🤷‍♂️ Nothing to lint.")
+            return
+        }
+        for path in projectPaths {
+            try lintScript(withName: scriptName, format: format, targetName: targetName, projectPath: path)
+        }
+    }
+
+    public func lintScript(withName scriptName: String, format: Format, targetName: String?, projectPath: String) throws {
         let xcodeproj = try XcodeProj(pathString: projectPath)
 
         let filteredTargets = try targets(in: xcodeproj, withName: targetName)
@@ -221,7 +241,7 @@ public final class ProjectService {
         return filteredTargets
     }
 
-    private func projectPath(inDirectory directory: String?) throws -> String {
+    private func projectPaths(inDirectory directory: String?, filterNames: [String]) throws -> [String] {
         let directoryPath: String
         if let directory = directory {
             directoryPath = directory
@@ -233,11 +253,12 @@ public final class ProjectService {
             directoryPath = FileManager.default.currentDirectoryPath
         }
         let folder = try Folder(path: directoryPath)
-        let file = folder.subfolders.first { $0.name.hasSuffix(Keys.projectExtension) }
-        guard let projectFile = file else {
-            throw Error.projectFileReadingFailed
-        }
-        return projectFile.path
+        return folder.subfolders
+            .filter { folder in
+                let projectName = folder.name.deleting(suffix: "." + Keys.projectExtension)
+                return folder.name.hasSuffix(Keys.projectExtension) && filterNames.contains(projectName)
+            }
+            .map { $0.path }
     }
 
     private func frameworksInformation() throws -> [Framework] {

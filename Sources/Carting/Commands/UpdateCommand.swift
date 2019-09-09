@@ -15,6 +15,7 @@ final class UpdateCommand: Command {
     private let projectDirectoryPath: OptionArgument<String>
     private let format: OptionArgument<Format>
     private let targetName: OptionArgument<String>
+    private let projectNames: OptionArgument<[String]>
 
     required init(parser: ArgumentParser) {
         let subparser = parser.add(subparser: command, overview: overview)
@@ -32,6 +33,9 @@ final class UpdateCommand: Command {
         targetName = subparser.add(option: "--target",
                                    shortName: "-t",
                                    usage: "The name of target.")
+        projectNames = subparser.add(option: "--project-names",
+                                     shortName: "-n",
+                                     usage: "The names of projects.")
     }
 
     func run(with arguments: ArgumentParser.Result) throws {
@@ -39,9 +43,11 @@ final class UpdateCommand: Command {
         let projectDirectoryPath = arguments.get(self.projectDirectoryPath) ?? ProcessInfo.processInfo.environment["PROJECT_DIR"]
         let format = arguments.get(self.format) ?? .list
         let targetName = arguments.get(self.targetName) ?? ProcessInfo.processInfo.environment["TARGET_NAME"]
+        let projectNames = arguments.get(self.projectNames) ?? []
         let projectService = try ProjectService(projectDirectoryPath: projectDirectoryPath)
         try projectService.updateScript(withName: name,
                                         format: format,
-                                        targetName: targetName)
+                                        targetName: targetName,
+                                        projectNames: projectNames)
     }
 }
