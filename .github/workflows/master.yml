@@ -1,4 +1,7 @@
-on: pull_request
+on:
+  push:
+    branches:    
+      - master
 name: Build and lint
 jobs:
   test:
