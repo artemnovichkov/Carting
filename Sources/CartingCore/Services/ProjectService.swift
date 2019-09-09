@@ -84,19 +84,18 @@ public final class ProjectService {
                     let outputFileListFileName = fileListName(forTargetName: target.name, type: .output)
                     let outputFileListPath = [xcfilelistsFolderPath, outputFileListFileName].joined(separator: "/")
 
+                    let inputFileListNewContent = inputPaths.joined(separator: "\n")
+                    filelistsWereUpdated = try updateFile(in: listsFolder,
+                                                          withName: inputFileListFileName,
+                                                          content: inputFileListNewContent)
+
+                    let outputFileListNewContent = outputPaths.joined(separator: "\n")
+                    filelistsWereUpdated = try updateFile(in: listsFolder,
+                                                          withName: outputFileListFileName,
+                                                          content: outputFileListNewContent)
+
                     if let projectBuildPhase = projectBuildPhase {
                         scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Keys.carthageScript)
-
-                        let inputFileListNewContent = inputPaths.joined(separator: "\n")
-                        filelistsWereUpdated = try updateFile(in: listsFolder,
-                                                              withName: inputFileListFileName,
-                                                              content: inputFileListNewContent)
-
-                        let outputFileListNewContent = outputPaths.joined(separator: "\n")
-                        filelistsWereUpdated = try updateFile(in: listsFolder,
-                                                              withName: outputFileListFileName,
-                                                              content: outputFileListNewContent)
-
                         scriptHasBeenUpdated = projectBuildPhase.update(inputFileListPath: inputFileListPath,
                                                                         outputFileListPath: outputFileListPath)
                     }
