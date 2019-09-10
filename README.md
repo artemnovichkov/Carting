@@ -95,7 +95,7 @@ $ make
 ```swift
 let package = Package(
     dependencies: [
-        .Package(url: "https://github.com/artemnovichkov/carting", majorVersion: 1)
+        .Package(url: "https://github.com/artemnovichkov/carting", majorVersion: 2)
     ]
 )
 ```
