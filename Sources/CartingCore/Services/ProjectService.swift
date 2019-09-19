@@ -256,7 +256,11 @@ public final class ProjectService {
         return folder.subfolders
             .filter { folder in
                 let projectName = folder.name.deleting(suffix: "." + Keys.projectExtension)
-                return folder.name.hasSuffix(Keys.projectExtension) && filterNames.contains(projectName)
+                var isValid = folder.name.hasSuffix(Keys.projectExtension)
+                if filterNames.isEmpty == false {
+                    isValid = isValid && filterNames.contains(projectName)
+                }
+                return isValid
             }
             .map { $0.path }
     }
