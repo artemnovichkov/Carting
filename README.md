@@ -8,34 +8,24 @@
         <img src="https://github.com/artemnovichkov/carting/workflows/Build/badge.svg" />
     <img src="https://img.shields.io/badge/homebrew-compatible-brightgreen.svg?style=flat" alt="Make" />
   <a href="https://swift.org/package-manager">
-    <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
-  </a>
-  <a href="https://github.com/JohnSundell/Marathon">
-    <img src="https://img.shields.io/badge/marathon-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
-  </a>
-</p>
-
-Do you use [Carthage](https://github.com/Carthage/Carthage)? Are you feel tired of adding special script and the paths to frameworks (point 4, 5 and 6 in [Getting Started guide](https://github.com/Carthage/Carthage#getting-started)) manually? Me too. Carting does it for you. It scans Carthage folder and linked frameworks, gets framework names and updates the script.
-
+    <img src="https://img.shields.io/badge/spm-compatible-briasdasal script and the 
 <p align="center">
   <img src=".github/carting.png" max-width="90%" alt="Carting usage" />
-</p>
+</p>sadsad
 
 
-## Using
-
-Run `carting update` in project folder. That's all.
+## Usingl.
 
 By default Carting searches a script named `Carthage`, but you can set a name of your script via command line arguments:
 
 ```
-$ carting update -s MyBestScript
+$ carting update -s MyBestScriptasdasd
 ```
 
 If there is no script with the name, Carting will add a new one.
 
 Since Xcode 10 Run Script Phases support declaring input and output files in a `.xcfilelist` file. This file should contain a newline-separated list of the file paths for the inputs or outputs. Carting uses it by default. If you need to work with your projects in old Xcode versions, use `-f file` option.
-
+asdasd
 **🚨Note**: be sure to have no uncommitted changes in project file to prevent project parsing errors 😱.
 
 <p align="center">
