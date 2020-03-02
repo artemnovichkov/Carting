@@ -50,7 +50,7 @@ type_body_length:
   warning: 800
   error: 1000
 
-line_length: 140
+line_length: 160
 
 function_parameter_count: 4
 
