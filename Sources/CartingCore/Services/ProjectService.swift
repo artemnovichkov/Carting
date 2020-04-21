@@ -12,6 +12,8 @@ public final class ProjectService {
     enum Error: Swift.Error {
         case projectFileReadingFailed
         case targetFilterFailed(name: String)
+        case nothingToUpdate
+        case noTargets(name: String?)
     }
 
     private enum Keys {
@@ -37,8 +39,7 @@ public final class ProjectService {
     public func updateScript(withName scriptName: String, format: Format, targetName: String?, projectNames: [String]) throws {
         let projectPaths = try self.projectPaths(inDirectory: projectDirectoryPath, filterNames: projectNames)
         guard projectPaths.count > 0 else {
-            print("🤷‍♂️ Nothing to update.")
-            return
+            throw Error.nothingToUpdate
         }
         for path in projectPaths {
             try updateScript(withName: scriptName, format: format, targetName: targetName, projectPath: path)
@@ -52,6 +53,10 @@ public final class ProjectService {
         var filelistsWereUpdated = false
 
         let filteredTargets = try targets(in: xcodeproj, withName: targetName)
+
+        if filteredTargets.isEmpty {
+            throw Error.noTargets(name: targetName)
+        }
 
         let carthageDynamicFrameworks = try dynamicFrameworksInformation()
         let carthageFolder = try projectFolder.subfolder(named: "Carthage")
@@ -130,7 +135,7 @@ public final class ProjectService {
             try xcodeproj.write(pathString: projectPath, override: true)
         }
         else if !filelistsWereUpdated {
-            print("🤷‍♂️ Nothing to update.")
+            throw Error.nothingToUpdate
         }
     }
 
@@ -159,6 +164,10 @@ public final class ProjectService {
         let xcodeproj = try XcodeProj(pathString: projectPath)
 
         let filteredTargets = try targets(in: xcodeproj, withName: targetName)
+
+        if filteredTargets.isEmpty {
+            throw Error.noTargets(name: targetName)
+        }
 
         let carthageDynamicFrameworks = try dynamicFrameworksInformation()
 
@@ -327,8 +336,18 @@ extension ProjectService.Error: CustomStringConvertible {
 
     var description: String {
         switch self {
-        case .projectFileReadingFailed: return "Can't find project file."
-        case .targetFilterFailed(let name): return "There is no target with \(name) name."
+            case .projectFileReadingFailed:
+                return "Can't find project file."
+            case .targetFilterFailed(let name):
+                return "There is no target with \(name) name."
+            case .nothingToUpdate:
+                return "🤷‍♂️ Nothing to update."
+            case .noTargets(let name):
+                var description = "There are no application targets"
+                if let name = name {
+                    description += " with \"\(name)\" name"
+                }
+                return description
         }
     }
 }
