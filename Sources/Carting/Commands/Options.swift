@@ -17,7 +17,7 @@ struct Options: ParsableArguments {
     @Option(name: [.short, .long], default: .list, help: "Format of input/output file paths: file - using simple paths, list - using xcfilelists")
     var format: Format
 
-    @Option(name: [.short, .long], default: ProcessInfo.processInfo.environment["TARGET_NAME"], help: "The project directory path.")
+    @Option(name: [.short, .long], default: ProcessInfo.processInfo.environment["TARGET_NAME"], help: "The project target name.")
     var target: String?
 
     @Option(name: [.customShort("n"), .long], help: "The names of projects.")
