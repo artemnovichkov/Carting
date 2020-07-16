@@ -12,13 +12,13 @@ public final class ProjectService {
     enum Error: Swift.Error {
         case projectFileReadingFailed
         case targetFilterFailed(name: String)
-        case nothingToUpdate
         case noTargets(name: String?)
     }
 
-    private enum Keys {
+    private enum Constants {
         static let projectExtension = "xcodeproj"
         static let carthageScript = "/usr/local/bin/carthage copy-frameworks"
+        static let nothingToUpdate = "🤷‍♂️ Nothing to update."
     }
 
     public let projectDirectoryPath: String?
@@ -39,7 +39,8 @@ public final class ProjectService {
     public func updateScript(withName scriptName: String, format: Format, targetName: String?, projectNames: [String]) throws {
         let projectPaths = try self.projectPaths(inDirectory: projectDirectoryPath, filterNames: projectNames)
         guard projectPaths.count > 0 else {
-            throw Error.nothingToUpdate
+            print(Constants.nothingToUpdate)
+            return
         }
         for path in projectPaths {
             try updateScript(withName: scriptName, format: format, targetName: targetName, projectPath: path)
@@ -73,14 +74,14 @@ public final class ProjectService {
                 switch format {
                 case .file:
                     if let projectBuildPhase = projectBuildPhase {
-                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Keys.carthageScript)
+                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Constants.carthageScript)
                         scriptHasBeenUpdated = projectBuildPhase.update(inputPaths: inputPaths, outputPaths: outputPaths)
                     }
                     else {
                         let buildPhase = PBXShellScriptBuildPhase(name: scriptName,
                                                                   inputPaths: outputPaths,
                                                                   outputPaths: outputPaths,
-                                                                  shellScript: Keys.carthageScript)
+                                                                  shellScript: Constants.carthageScript)
 
                         target.buildPhases.append(buildPhase)
                         xcodeproj.pbxproj.add(object: buildPhase)
@@ -110,7 +111,7 @@ public final class ProjectService {
                                                           content: outputFileListNewContent)
 
                     if let projectBuildPhase = projectBuildPhase {
-                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Keys.carthageScript)
+                        scriptHasBeenUpdated = projectBuildPhase.update(shellScript: Constants.carthageScript)
                         scriptHasBeenUpdated = projectBuildPhase.update(inputFileListPath: inputFileListPath,
                                                                         outputFileListPath: outputFileListPath)
                     }
@@ -118,7 +119,7 @@ public final class ProjectService {
                         let buildPhase = PBXShellScriptBuildPhase(name: scriptName,
                                                                   inputFileListPaths: [inputFileListPath],
                                                                   outputFileListPaths: [outputFileListPath],
-                                                                  shellScript: Keys.carthageScript)
+                                                                  shellScript: Constants.carthageScript)
 
                         target.buildPhases.append(buildPhase)
                         xcodeproj.pbxproj.add(object: buildPhase)
@@ -135,7 +136,7 @@ public final class ProjectService {
             try xcodeproj.write(pathString: projectPath, override: true)
         }
         else if !filelistsWereUpdated {
-            throw Error.nothingToUpdate
+            print(Constants.nothingToUpdate)
         }
     }
 
@@ -264,8 +265,8 @@ public final class ProjectService {
         let folder = try Folder(path: directoryPath)
         return folder.subfolders
             .filter { folder in
-                let projectName = folder.name.deleting(suffix: "." + Keys.projectExtension)
-                var isValid = folder.name.hasSuffix(Keys.projectExtension)
+                let projectName = folder.name.deleting(suffix: "." + Constants.projectExtension)
+                var isValid = folder.name.hasSuffix(Constants.projectExtension)
                 if filterNames.isEmpty == false {
                     isValid = isValid && filterNames.contains(projectName)
                 }
@@ -340,8 +341,6 @@ extension ProjectService.Error: CustomStringConvertible {
                 return "Can't find project file."
             case .targetFilterFailed(let name):
                 return "There is no target with \(name) name."
-            case .nothingToUpdate:
-                return "🤷‍♂️ Nothing to update."
             case .noTargets(let name):
                 var description = "There are no application targets"
                 if let name = name {
