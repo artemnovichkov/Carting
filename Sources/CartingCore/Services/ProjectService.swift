@@ -242,7 +242,7 @@ public final class ProjectService {
     }
 
     private func targets(in project: XcodeProj, withName name: String?) throws -> [PBXNativeTarget] {
-				let filteredTargets = project.targets(with: [.application, .appExtension], name: name)
+        let filteredTargets = project.targets(with: [.application, .appExtension], name: name)
 
         if let name = name, filteredTargets.isEmpty {
             throw Error.targetFilterFailed(name: name)
