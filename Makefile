@@ -4,7 +4,7 @@ OS?=sierra
 PREFIX?=/usr/local
 PROJECT?=Carting
 RELEASE_BINARY_FOLDER?=$(BUILD_FOLDER)/release/$(PROJECT)
-VERSION?=2.1.5
+VERSION?=2.1.6
 
 build:
 	swift build --disable-sandbox -c release
