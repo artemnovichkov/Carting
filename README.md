@@ -98,7 +98,7 @@ let package = Package(
 ```
 ## Author
 
-Artem Novichkov, novichkoff93@gmail.com
+Artem Novichkov, https://www.artemnovichkov.com/about
 
 ## License
 
